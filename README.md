@@ -16,7 +16,14 @@ composer install
 ```php
 $config    = Yaml::parseFile('config.yml');
 $scheduler = new Scheduler( $config['scheduler'], 'cache.json');
-$scheduler->run();
+
+try  {
+  $scheduler->run();
+}
+catch( Exception $e ) {
+  error_log("Scheduler error: " . $e->getMessage());  // or use your own logging
+  exit();
+}
 ```
 
 **Config**

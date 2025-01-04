@@ -17,7 +17,14 @@ $endTime = time() + 15;
 
 while( time() < $endTime )
 {
-  $scheduler->run();
+  try  {
+    $scheduler->run();
+  }
+  catch( Exception $e ) {
+    error_log("Scheduler error: " . $e->getMessage());
+    exit();
+  }
+
   sleep(1);  // wait 1 second between checks
 }
 
