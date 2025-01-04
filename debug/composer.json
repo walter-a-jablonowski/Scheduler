@@ -1,0 +1,9 @@
+{
+  "name": "web/scheduler",
+  "description": "A flexible task scheduler with configurable time intervals",
+  "type": "library",
+  "require": {
+    "php": ">=7.4",
+    "symfony/yaml": "^6.0"
+  }
+}
