@@ -1,6 +1,6 @@
 # Scheduler
 
-A flexible task scheduler that supports various time intervals from 5 minutes to monthly
+All in one task scheduler: run a single script in a scheduler that runs multiple tasks based on configurable time intervals. Also supports advanced features like likeliness of running.
 
 ## Installation
 
