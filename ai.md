@@ -20,3 +20,7 @@ Indent all codes with 2 spaces and put the { on the next line. Write no space be
  --
 
 In config.yml add a type field per scheduler task. Types are 'URL' and 'Script'. In Scheduler class in the run method add a switch case for each type below shouldRunTask. We already have he code for the url case. Add the script case which is a of anonym function to have a new scope and in there perform a require.
+
+ --
+
+Rename the field url to 'name', update the code where needed. Also add a field 'args' that may be present or missing. it cointains multiple args that are attached to the query string of the url in Scheuler class fpr type url. For type script make it usable in the anonym function.

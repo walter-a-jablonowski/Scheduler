@@ -31,7 +31,7 @@ class Scheduler
   {
     foreach( $this->config as $task )
     {
-      if( ! isset($task['name'], $task['url'], $task['interval']))
+      if( ! isset($task['name'], $task['interval']))
         throw new Exception('Invalid task configuration: ' . json_encode($task));
 
       if( $this->shouldRunTask($task))
@@ -39,11 +39,18 @@ class Scheduler
         if( !isset($task['type']))
           throw new Exception('Task type is not specified: ' . $task['name']);
 
+        if( ! isset($task['name']))
+          throw new Exception('Task name/path is not specified: ' . $task['name']);
+
         switch( $task['type'])
         {
           case 'URL':
+            $url = $task['name'];
             
-            $ch = curl_init( $task['url']);
+            if( isset($task['args']) && is_array($task['args']))
+              $url .= (strpos($url, '?') === false ? '?' : '&') . implode('&', $task['args']);
+            
+            $ch = curl_init( $url);
             curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true);
             curl_exec( $ch );
             curl_close( $ch );
@@ -52,11 +59,8 @@ class Scheduler
           case 'Script':
 
             ( function() use ($task) {
-              
-              if( ! isset($task['url']))
-                throw new Exception('Script path is not specified in url field: ' . $task['name']);
-                
-              require $task['url'];
+              extract(['args' => isset($task['args']) ? $task['args'] : []], EXTR_SKIP);
+              require $task['name'];
 
             })();
           

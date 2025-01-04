@@ -2,41 +2,43 @@ scheduler:
 
   # - name:     my_script_task
   #   type:     Script
-  #   url:      /path/to/your/script.php
+  #   name:     /path/to/your/script.php
+  #   args:     ["arg1", "arg2"]
   #   interval: hourly
 
   - name:       quick_sync
     type:       URL
-    url:        http://example.com/quick-sync
+    name:       http://example.com/quick-sync
+    args:       ["param1=value1", "param2=value2"]
     interval:   5min
     likeliness: 50
 
   - name:       status_check
     type:       URL
-    url:        http://example.com/status-check
+    name:       http://example.com/status-check
     interval:   10min
 
   - name:       cache_cleanup
     type:       URL
-    url:        http://example.com/cache-cleanup
+    name:       http://example.com/cache-cleanup
     interval:   30min
 
   - name:       hourly_task
     type:       URL
-    url:        http://example.com/hourly-script
+    name:       http://example.com/hourly-script
     interval:   hourly
 
   - name:       daily_backup
     type:       URL
-    url:        http://example.com/daily-backup
+    name:       http://example.com/daily-backup
     interval:   daily
 
   - name:       weekly_report
     type:       URL
-    url:        http://example.com/weekly-report
+    name:       http://example.com/weekly-report
     interval:   weekly
 
   - name:       monthly_cleanup
     type:       URL
-    url:        http://example.com/monthly-cleanup
+    name:       http://example.com/monthly-cleanup
     interval:   monthly
