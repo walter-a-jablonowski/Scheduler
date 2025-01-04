@@ -11,12 +11,13 @@ composer install
 ## Configuration
 
 ```yaml
-
 scheduler:
 
   - type:       URL
     name:       http://example.com/quick-sync
-    args:       ["param1=value1", "param2=value2"]
+    args:       
+      action:   sync
+      mode:     quick
     interval:   5min  # available: 5min, 10min, 30min, hourly, daily, weekly, monthly (5sec, 10sec used for debugging)
     likeliness: 75    # 75% chance of running when due
 
@@ -26,7 +27,9 @@ scheduler:
 
   - type:     Script
     name:     /path/to/cleanup.php
-    args:     ["arg1", "arg2"]  # TASK: named
+    args:     
+      logLevel: debug
+      mode:     full
     interval: daily
 ```
 
@@ -42,7 +45,7 @@ $scheduler->run();
 
 - `type`:       Type of task ('URL' or 'Script')
 - `name`:       Full URL without query parameters (URL tasks) or full path to the script
-- `args`:       (Optional) Arguments (or url query parameters)
+- `args`:       (Optional) Named arguments (URL: converted to query parameters, Script: available as variables)
 - `interval`:   Time interval between runs
 - `likeliness`: (Optional) Percentage chance (1-100) of running when due
 - `callback`:   (Optional) Path to a PHP script that will be called after task execution

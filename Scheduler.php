@@ -45,7 +45,14 @@ class Scheduler
             $url = $task['name'];
             
             if( isset($task['args']) && is_array($task['args']))
-              $url .= (strpos($url, '?') === false ? '?' : '&') . implode('&', $task['args']);
+            {
+              $queryParams = [];
+              foreach( $task['args'] as $key => $value)
+                $queryParams[] = urlencode($key) . '=' . urlencode($value);
+                
+              if( !empty($queryParams))
+                $url .= (strpos($url, '?') === false ? '?' : '&') . implode('&', $queryParams);
+            }
             
             $ch = curl_init( $url);
             curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true);
@@ -57,7 +64,7 @@ class Scheduler
               $this->handleCallback($task['callback'], [
                 'response'  => $response,
                 'http_code' => $info['http_code'],
-                'time'      => $info['time'],
+                'time'      => $info['total_time'],
                 'url'       => $url
               ]);
             break;

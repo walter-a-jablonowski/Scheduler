@@ -2,18 +2,24 @@ scheduler:
 
   # - type:     Script
   #   name:     /path/to/your/script.php
-  #   args:     ["arg1", "arg2"]
+  #   args:     
+  #     param1:  value1
+  #     param2:  value2
   #   interval: hourly
   #   callback: /path/to/callback.php
 
   - type:       URL
     name:       http://example.com/quick-sync
-    args:       ["param1=value1", "param2=value2"]
+    args:       
+      action:   sync
+      mode:     quick
     interval:   5sec       # debug interval
     callback:   debug/callbacks/quick-sync.php
     likeliness: 50
 
   - type:       URL
     name:       http://example.com/status-check
+    args:
+      format:   json
     interval:   10sec     # debug interval
     callback:   debug/callbacks/status-check.php
