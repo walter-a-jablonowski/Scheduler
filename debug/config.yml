@@ -1,30 +1,37 @@
 scheduler:
 
   - name: quick_sync
+    type: URL
     url: http://example.com/quick-sync
     interval: 5min
     likeliness: 50
 
   - name: status_check
+    type: URL
     url: http://example.com/status-check
     interval: 10min
 
   - name: cache_cleanup
+    type: URL
     url: http://example.com/cache-cleanup
     interval: 30min
 
   - name: hourly_task
+    type: URL
     url: http://example.com/hourly-script
     interval: hourly
 
   - name: daily_backup
+    type: URL
     url: http://example.com/daily-backup
     interval: daily
 
   - name: weekly_report
+    type: URL
     url: http://example.com/weekly-report
     interval: weekly
 
   - name: monthly_cleanup
+    type: URL
     url: http://example.com/monthly-cleanup
     interval: monthly

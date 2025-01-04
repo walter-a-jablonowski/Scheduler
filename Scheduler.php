@@ -36,10 +36,31 @@ class Scheduler
 
       if( $this->shouldRunTask($task))
       {
-        $ch = curl_init( $task['url']);
-        curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true);
-        curl_exec( $ch );
-        curl_close( $ch );
+        if( !isset($task['type']))
+          throw new Exception('Task type is not specified: ' . $task['name']);
+
+        switch( $task['type'])
+        {
+          case 'URL':
+            $ch = curl_init( $task['url']);
+            curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true);
+            curl_exec( $ch );
+            curl_close( $ch );
+            break;
+
+          case 'Script':
+            (function() use ($task)
+            {
+              if( !isset($task['url']))
+                throw new Exception('Script path is not specified in url field: ' . $task['name']);
+                
+              require $task['url'];
+            })();
+            break;
+
+          default:
+            throw new Exception('Invalid task type: ' . $task['type']);
+        }
 
         $this->cache[ $task['name']] = (new DateTime())->format('Y-m-d H:i:s');
         file_put_contents( 
