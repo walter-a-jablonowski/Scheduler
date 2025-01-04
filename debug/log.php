@@ -1,20 +1,30 @@
 <?php
 
 $log = date('Y-m-d H:i:s') . " Task completed\n";
+$log .= "Type:       $type\n";
+$log .= "Name:       $name\n";
+$log .= "Interval:   $interval\n";
+$log .= "Time:       {$time}s\n";
+
+if( !empty($args))
+{
+  $log .= "Args:\n";
+  foreach( $args as $key => $value)
+    $log .= "  $key: $value\n";
+}
+
+if( $likeliness < 100)
+  $log .= "Likeliness: $likeliness%\n";
 
 // For URL tasks
-if( isset($http_code))
+if( $type === 'URL')
 {
-  $log .= "Type:       URL\n";
-  $log .= "URL:        $url\n";
   $log .= "HTTP Code:  $http_code\n";
-  $log .= "Time:       {$time}s\n";
   $log .= "Response:   " . substr($response, 0, 100) . (strlen($response) > 100 ? '...' : '') . "\n";
 }
 // For Script tasks
-else if( isset($output))
+else if( $type === 'Script')
 {
-  $log .= "Type:       Script\n";
   $log .= "Output:     " . substr($output, 0, 100) . (strlen($output) > 100 ? '...' : '') . "\n";
   if( isset($return))
     $log .= "Return:     " . print_r($return, true) . "\n";

@@ -68,7 +68,11 @@ class Scheduler
                 'response'  => $response,
                 'http_code' => $info['http_code'],
                 'time'      => round($time, 3),
-                'url'       => $url
+                'type'      => $task['type'],
+                'name'      => $task['name'],
+                'args'      => isset($task['args']) ? $task['args'] : [],
+                'interval'  => $task['interval'],
+                'likeliness'=> isset($task['likeliness']) ? $task['likeliness'] : 100
               ]);
             break;
 
@@ -93,11 +97,15 @@ class Scheduler
             
             if( isset($task['callback']))
               $this->handleCallback($task['callback'], [
-                'output' => $result['output'],
-                'return' => $result['return'],
-                'time'   => round($time, 3)
+                'output'    => $result['output'],
+                'return'    => $result['return'],
+                'time'      => round($time, 3),
+                'type'      => $task['type'],
+                'name'      => $task['name'],
+                'args'      => isset($task['args']) ? $task['args'] : [],
+                'interval'  => $task['interval'],
+                'likeliness'=> isset($task['likeliness']) ? $task['likeliness'] : 100
               ]);
-
             break;
 
           default:
