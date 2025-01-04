@@ -4,3 +4,4 @@ scheduler.code-workspace
 composer.lock
 vendor/
 debug/scheduler-cache.json
+debug/scheduler.log

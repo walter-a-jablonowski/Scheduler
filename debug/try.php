@@ -13,7 +13,7 @@ $scheduler = new Scheduler(
 );
 
 echo "Running scheduler for 30 seconds...\n";
-$endTime = time() + 30;
+$endTime = time() + 15;
 
 while( time() < $endTime )
 {
