@@ -11,6 +11,7 @@ composer install
 ## Configuration
 
 ```yaml
+
 scheduler:
 
   - type:       URL
@@ -23,10 +24,10 @@ scheduler:
     name:       http://example.com/daily-backup
     interval:   daily
 
-  # - type:     Script
-  #   name:     /path/to/cleanup.php
-  #   args:     ["arg1", "arg2"]
-  #   interval: daily
+  - type:     Script
+    name:     /path/to/cleanup.php
+    args:     ["arg1", "arg2"]  # TASK: named
+    interval: daily
 ```
 
 ## Usage
@@ -39,8 +40,21 @@ $scheduler->run();
 
 ## Configuration Options
 
-- `type`: Type of task ('URL' or 'Script')
-- `name`: For URL tasks: The full URL without query parameters. For Script tasks: The full path to the script
-- `args`: (Optional) For URL tasks: Query parameters to append to the URL. For Script tasks: Arguments available in the script
-- `interval`: Time interval between runs
-- `likeliness`: (Optional) Percentage chance (1-100) of running when due. If not set, task always runs when due
+- `type`:       Type of task ('URL' or 'Script')
+- `name`:       Full URL without query parameters (URL tasks) or full path to the script
+- `args`:       (Optional) Arguments (or url query parameters)
+- `interval`:   Time interval between runs
+- `likeliness`: (Optional) Percentage chance (1-100) of running when due
+- `callback`:   (Optional) Path to a PHP script that will be called after task execution
+  - Type URL
+    ```php
+    $response;   // Response body from the URL
+    $http_code;  // HTTP status code
+    $time;       // Run time
+    $url;        // Full URL that was called (including query parameters)
+    ```
+  - Type Script
+    ```php
+    $output;     // Captured output from the script
+    $return;     // Value of $return variable if set in the script
+    ```

@@ -49,18 +49,38 @@ class Scheduler
             
             $ch = curl_init( $url);
             curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true);
-            curl_exec( $ch );
+            $response = curl_exec( $ch );
+            $info = curl_getinfo( $ch );
             curl_close( $ch );
+
+            if( isset($task['callback']))
+              $this->handleCallback($task['callback'], [
+                'response'  => $response,
+                'http_code' => $info['http_code'],
+                'time'      => $info['time'],
+                'url'       => $url
+              ]);
             break;
 
           case 'Script':
+            $result = null;
+            
+            ( function() use ($task, &$result) {
 
-            ( function() use ($task) {
               extract(['args' => isset($task['args']) ? $task['args'] : []], EXTR_SKIP);
+              ob_start();
+
               require $task['name'];
+              $result = [
+                'output' => ob_get_clean(),
+                'return' => isset($return) ? $return : null
+              ];
 
             })();
-          
+
+            if( isset($task['callback']))
+              $this->handleCallback($task['callback'], $result);
+
             break;
 
           default:
@@ -137,5 +157,16 @@ class Scheduler
     }
 
     return ($now >= $nextRun) && $likely;
+  }
+
+  private function handleCallback( string $callback, array $data): void
+  {
+    if( file_exists($callback))
+    {
+      ( function() use ($callback, $data) {
+        extract($data, EXTR_SKIP);
+        require $callback;
+      })();
+    }
   }
 }

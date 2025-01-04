@@ -24,3 +24,7 @@ In config.yml add a type field per scheduler task. Types are 'URL' and 'Script'.
  --
 
 Rename the field url to 'name', update the code where needed. Also add a field 'args' that may be present or missing. it cointains multiple args that are attached to the query string of the url in Scheuler class fpr type url. For type script make it usable in the anonym function.
+
+ --
+
+Now use the 5sec and 10sec intervals to improve try.php which is used for trying the class and debugging.

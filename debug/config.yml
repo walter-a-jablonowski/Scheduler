@@ -4,33 +4,16 @@ scheduler:
   #   name:     /path/to/your/script.php
   #   args:     ["arg1", "arg2"]
   #   interval: hourly
+  #   callback: /path/to/callback.php
 
   - type:       URL
     name:       http://example.com/quick-sync
     args:       ["param1=value1", "param2=value2"]
-    interval:   5min
+    interval:   5sec       # debug interval
+    callback:   debug/callbacks/quick-sync.php
     likeliness: 50
 
   - type:       URL
     name:       http://example.com/status-check
-    interval:   10min
-
-  - type:       URL
-    name:       http://example.com/cache-cleanup
-    interval:   30min
-
-  - type:       URL
-    name:       http://example.com/hourly-script
-    interval:   hourly
-
-  - type:       URL
-    name:       http://example.com/daily-backup
-    interval:   daily
-
-  - type:       URL
-    name:       http://example.com/weekly-report
-    interval:   weekly
-
-  - type:       URL
-    name:       http://example.com/monthly-cleanup
-    interval:   monthly
+    interval:   10sec     # debug interval
+    callback:   debug/callbacks/status-check.php
