@@ -1,29 +1,32 @@
 <?php
 
 $log = date('Y-m-d H:i:s') . " Task completed\n";
-$log .= "Type:       $type\n";
-$log .= "Name:       $name\n";
-$log .= "Interval:   $interval\n";
-$log .= "Time:       {$time}s\n";
 
-if( !empty($args))
+$log .= "Config:\n";
+$log .= "  Type:       {$config['type']}\n";
+$log .= "  Name:       {$config['name']}\n";
+$log .= "  Interval:   {$config['interval']}\n";
+
+if( !empty($config['args']))
 {
-  $log .= "Args:\n";
-  foreach( $args as $key => $value)
-    $log .= "  $key: $value\n";
+  $log .= "  Args:\n";
+  foreach( $config['args'] as $key => $value)
+    $log .= "    $key: $value\n";
 }
 
-if( $likeliness < 100)
-  $log .= "Likeliness: $likeliness%\n";
+if( $config['likeliness'] < 100)
+  $log .= "  Likeliness: {$config['likeliness']}%\n";
+
+$log .= "Time:       {$time}s\n";
 
 // For URL tasks
-if( $type === 'URL')
+if( $config['type'] === 'URL')
 {
   $log .= "HTTP Code:  $http_code\n";
   $log .= "Response:   " . substr($response, 0, 100) . (strlen($response) > 100 ? '...' : '') . "\n";
 }
 // For Script tasks
-else if( $type === 'Script')
+else if( $config['type'] === 'Script')
 {
   $log .= "Output:     " . substr($output, 0, 100) . (strlen($output) > 100 ? '...' : '') . "\n";
   if( isset($return))

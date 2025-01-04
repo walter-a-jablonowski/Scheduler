@@ -68,11 +68,13 @@ class Scheduler
                 'response'  => $response,
                 'http_code' => $info['http_code'],
                 'time'      => round($time, 3),
-                'type'      => $task['type'],
-                'name'      => $task['name'],
-                'args'      => isset($task['args']) ? $task['args'] : [],
-                'interval'  => $task['interval'],
-                'likeliness'=> isset($task['likeliness']) ? $task['likeliness'] : 100
+                'config'    => [
+                  'type'      => $task['type'],
+                  'name'      => $task['name'],
+                  'args'      => isset($task['args']) ? $task['args'] : [],
+                  'interval'  => $task['interval'],
+                  'likeliness'=> isset($task['likeliness']) ? $task['likeliness'] : 100
+                ]
               ]);
             break;
 
@@ -100,11 +102,13 @@ class Scheduler
                 'output'    => $result['output'],
                 'return'    => $result['return'],
                 'time'      => round($time, 3),
-                'type'      => $task['type'],
-                'name'      => $task['name'],
-                'args'      => isset($task['args']) ? $task['args'] : [],
-                'interval'  => $task['interval'],
-                'likeliness'=> isset($task['likeliness']) ? $task['likeliness'] : 100
+                'config'    => [
+                  'type'      => $task['type'],
+                  'name'      => $task['name'],
+                  'args'      => isset($task['args']) ? $task['args'] : [],
+                  'interval'  => $task['interval'],
+                  'likeliness'=> isset($task['likeliness']) ? $task['likeliness'] : 100
+                ]
               ]);
             break;
 
