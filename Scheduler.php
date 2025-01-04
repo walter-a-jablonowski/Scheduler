@@ -31,17 +31,11 @@ class Scheduler
   {
     foreach( $this->config as $task )
     {
-      if( ! isset($task['name'], $task['interval']))
+      if( ! isset($task['type'], $task['name'], $task['interval']))
         throw new Exception('Invalid task configuration: ' . json_encode($task));
 
       if( $this->shouldRunTask($task))
       {
-        if( !isset($task['type']))
-          throw new Exception('Task type is not specified: ' . $task['name']);
-
-        if( ! isset($task['name']))
-          throw new Exception('Task name/path is not specified: ' . $task['name']);
-
         switch( $task['type'])
         {
           case 'URL':
