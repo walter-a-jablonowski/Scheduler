@@ -7,6 +7,8 @@ class Scheduler
   private array  $cache;
   
   private const INTERVALS = [
+    '5sec'    => 5,       // used for debugging
+    '10sec'   => 10,      // used for debugging
     '5min'    => 300,
     '10min'   => 600,
     '30min'   => 1800,
@@ -39,6 +41,7 @@ class Scheduler
         switch( $task['type'])
         {
           case 'URL':
+
             $url = $task['name'];
             
             if( isset($task['args']) && is_array($task['args']))
@@ -100,6 +103,12 @@ class Scheduler
 
     switch( $interval )
     {
+      case '5sec':
+        $nextRun->add( new DateInterval('PT5S'));   // PT5S: period of 5 seconds
+        break;
+      case '10sec':
+        $nextRun->add( new DateInterval('PT10S'));  // PT10S: period of 10 seconds
+        break;
       case '5min':
         $nextRun->add( new DateInterval('PT5M'));   // PT5M: period of 5 minutes
         break;

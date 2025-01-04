@@ -16,7 +16,7 @@ scheduler:
   - type:       URL
     name:       http://example.com/quick-sync
     args:       ["param1=value1", "param2=value2"]
-    interval:   5min  # available: 5min, 10min, 30min, hourly, daily, weekly, monthly
+    interval:   5min  # available: 5min, 10min, 30min, hourly, daily, weekly, monthly (5sec, 10sec used for debugging)
     likeliness: 75    # 75% chance of running when due
 
   - type:       URL
