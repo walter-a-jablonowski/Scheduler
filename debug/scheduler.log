@@ -1,0 +1,182 @@
+2025-01-04 15:13:18 Task completed
+Type:       Script
+Output:     Script running with args:
+param1: value1
+param2: value2 
+
+Return:     Array
+(
+    [status] => success
+    [timestamp] => 1735999998
+)
+
+
+2025-01-04 15:13:18 Task completed
+Type:       URL
+URL:        http://example.com/quick-sync?action=sync&mode=quick
+HTTP Code:  404
+Time:       0.406008s
+Response:   <!doctype html>
+<html>
+<head>
+    <title>Example Domain</title>
+
+    <meta charset="utf-8" />
+    <m...
+
+2025-01-04 15:13:18 Task completed
+Type:       URL
+URL:        http://example.com/status-check?format=json
+HTTP Code:  404
+Time:       0.387708s
+Response:   <!doctype html>
+<html>
+<head>
+    <title>Example Domain</title>
+
+    <meta charset="utf-8" />
+    <m...
+
+2025-01-04 15:13:23 Task completed
+Type:       Script
+Output:     Script running with args:
+param1: value1
+param2: value2
+
+Return:     Array
+(
+    [status] => success
+    [timestamp] => 1736000003
+)
+
+
+2025-01-04 15:13:25 Task completed
+Type:       URL
+URL:        http://example.com/quick-sync?action=sync&mode=quick
+HTTP Code:  404
+Time:       0.350595s
+Response:   <!doctype html>
+<html>
+<head>
+    <title>Example Domain</title>
+
+    <meta charset="utf-8" />
+    <m...
+
+2025-01-04 15:13:28 Task completed
+Type:       Script
+Output:     Script running with args:
+param1: value1
+param2: value2
+
+Return:     Array
+(
+    [status] => success
+    [timestamp] => 1736000008
+)
+
+
+2025-01-04 15:13:28 Task completed
+Type:       URL
+URL:        http://example.com/status-check?format=json
+HTTP Code:  404
+Time:       0.313367s
+Response:   <!doctype html>
+<html>
+<head>
+    <title>Example Domain</title>
+
+    <meta charset="utf-8" />
+    <m...
+
+2025-01-04 15:13:32 Task completed
+Type:       URL
+URL:        http://example.com/quick-sync?action=sync&mode=quick
+HTTP Code:  404
+Time:       0.326115s
+Response:   <!doctype html>
+<html>
+<head>
+    <title>Example Domain</title>
+
+    <meta charset="utf-8" />
+    <m...
+
+2025-01-04 15:13:33 Task completed
+Type:       Script
+Output:     Script running with args:
+param1: value1
+param2: value2
+
+Return:     Array
+(
+    [status] => success
+    [timestamp] => 1736000013
+)
+
+
+2025-01-04 15:13:38 Task completed
+Type:       Script
+Output:     Script running with args:
+param1: value1
+param2: value2
+
+Return:     Array
+(
+    [status] => success
+    [timestamp] => 1736000018
+)
+
+
+2025-01-04 15:13:38 Task completed
+Type:       URL
+URL:        http://example.com/quick-sync?action=sync&mode=quick
+HTTP Code:  404
+Time:       0.366078s
+Response:   <!doctype html>
+<html>
+<head>
+    <title>Example Domain</title>
+
+    <meta charset="utf-8" />
+    <m...
+
+2025-01-04 15:13:38 Task completed
+Type:       URL
+URL:        http://example.com/status-check?format=json
+HTTP Code:  404
+Time:       0.384142s
+Response:   <!doctype html>
+<html>
+<head>
+    <title>Example Domain</title>
+
+    <meta charset="utf-8" />
+    <m...
+
+2025-01-04 15:13:43 Task completed
+Type:       Script
+Output:     Script running with args:
+param1: value1
+param2: value2
+
+Return:     Array
+(
+    [status] => success
+    [timestamp] => 1736000023
+)
+
+
+2025-01-04 15:13:44 Task completed
+Type:       URL
+URL:        http://example.com/quick-sync?action=sync&mode=quick
+HTTP Code:  404
+Time:       0.326541s
+Response:   <!doctype html>
+<html>
+<head>
+    <title>Example Domain</title>
+
+    <meta charset="utf-8" />
+    <m...
+

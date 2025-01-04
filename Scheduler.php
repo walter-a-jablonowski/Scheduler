@@ -41,6 +41,7 @@ class Scheduler
         switch( $task['type'])
         {
           case 'URL':
+            $startTime = microtime(true);
 
             $url = $task['name'];
             
@@ -60,17 +61,20 @@ class Scheduler
             $info = curl_getinfo( $ch );
             curl_close( $ch );
 
+            $time = microtime(true) - $startTime;
+
             if( isset($task['callback']))
               $this->handleCallback($task['callback'], [
                 'response'  => $response,
                 'http_code' => $info['http_code'],
-                'time'      => $info['total_time'],
+                'time'      => round($time, 3),
                 'url'       => $url
               ]);
             break;
 
           case 'Script':
             $result = null;
+            $startTime = microtime(true);
             
             ( function() use ($task, &$result) {
 
@@ -85,8 +89,14 @@ class Scheduler
 
             })();
 
+            $time = microtime(true) - $startTime;
+            
             if( isset($task['callback']))
-              $this->handleCallback($task['callback'], $result);
+              $this->handleCallback($task['callback'], [
+                'output' => $result['output'],
+                'return' => $result['return'],
+                'time'   => round($time, 3)
+              ]);
 
             break;
 

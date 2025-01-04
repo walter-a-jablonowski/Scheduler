@@ -19,4 +19,4 @@ while( time() < $endTime )
   sleep(1);  // Wait 1 second between checks
 }
 
-echo "Done.\n";
+echo "Done\n";
