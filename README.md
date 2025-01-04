@@ -7,8 +7,6 @@ All in one scheduler
 - configure multiple tasks in yml (syncable on multiple devices)
 - also supports advanced features like running a task based on likeliness
 
-## Installation
-
 ```bash
 composer install
 ```
@@ -16,7 +14,7 @@ composer install
 ## Sample
 
 ```php
-$config = Yaml::parseFile('config.yml');
+$config    = Yaml::parseFile('config.yml');
 $scheduler = new Scheduler( $config['scheduler'], 'cache.json');
 $scheduler->run();
 ```
@@ -32,19 +30,19 @@ scheduler:
     args:       
       action:   sync
       mode:     quick
-    interval:   5min  # available: 5min, 10min, 30min, hourly, daily, weekly, monthly (5sec, 10sec used for debugging)
+    interval:   5min  # 5min, 10min, 30min, hourly, daily, weekly, monthly (5sec, 10sec used for debugging)
     likeliness: 75    # 75% chance of running when due
 
   - type:       URL
     name:       http://example.com/daily-backup
     interval:   daily
 
-  - type:     Script
-    name:     /path/to/cleanup.php
+  - type:       Script
+    name:       /path/to/cleanup.php
     args:     
       logLevel: debug
       mode:     full
-    interval: daily
+    interval:   daily
 ```
 
 ## Fields
