@@ -5,7 +5,7 @@ class Scheduler
   private string $cacheFile;
   private array  $config;
   private array  $cache;
-  private string $defaultCallback;
+  private $callback;
   
   private const INTERVALS = [
     '5sec'    => 5,       // used for debugging
@@ -19,11 +19,11 @@ class Scheduler
     'monthly' => 2592000
   ];
 
-  public function __construct( array $config, string $cacheFile, string $defaultCallback = null)
+  public function __construct( array $config, string $cacheFile, callable $callback = null)
   {
     $this->config    = $config;
     $this->cacheFile = $cacheFile;
-    $this->defaultCallback = $defaultCallback;
+    $this->callback  = $callback;
 
     if( file_exists( $this->cacheFile ))
       $this->cache = json_decode( file_get_contents($this->cacheFile), true) ?? [];
@@ -65,8 +65,8 @@ class Scheduler
 
             $time = microtime(true) - $startTime;
 
-            if( $this->defaultCallback)
-              $this->handleCallback( $this->defaultCallback, [
+            if( $this->callback)
+              ($this->callback)([
                 'response'  => $response,
                 'http_code' => $info['http_code'],
                 'time'      => round($time, 3),
@@ -99,8 +99,8 @@ class Scheduler
 
             $time = microtime(true) - $startTime;
             
-            if( $this->defaultCallback)
-              $this->handleCallback( $this->defaultCallback, [
+            if( $this->callback)
+              ($this->callback)([
                 'output'    => $result['output'],
                 'return'    => $result['return'],
                 'time'      => round($time, 3),
@@ -188,16 +188,5 @@ class Scheduler
     }
 
     return ($now >= $nextRun) && $likely;
-  }
-
-  private function handleCallback( string $callback, array $data): void
-  {
-    if( file_exists($callback))
-    {
-      ( function() use ($callback, $data) {
-        extract($data, EXTR_SKIP);
-        require $callback;
-      })();
-    }
   }
 }

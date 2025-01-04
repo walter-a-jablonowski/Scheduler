@@ -4,11 +4,12 @@ use Symfony\Component\Yaml\Yaml;
 
 require_once 'vendor/autoload.php';
 require_once '../Scheduler.php';
+require_once 'log.php';
 
 $scheduler = new Scheduler(
   Yaml::parseFile('config.yml')['scheduler'],
   'scheduler-cache.json',
-  'log.php'
+  'logTask'
 );
 
 echo "Running scheduler for 30 seconds...\n";
