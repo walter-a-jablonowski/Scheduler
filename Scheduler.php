@@ -5,6 +5,7 @@ class Scheduler
   private string $cacheFile;
   private array  $config;
   private array  $cache;
+  private string $defaultCallback;
   
   private const INTERVALS = [
     '5sec'    => 5,       // used for debugging
@@ -18,10 +19,11 @@ class Scheduler
     'monthly' => 2592000
   ];
 
-  public function __construct( array $config, string $cacheFile)
+  public function __construct( array $config, string $cacheFile, string $defaultCallback = null)
   {
     $this->config    = $config;
     $this->cacheFile = $cacheFile;
+    $this->defaultCallback = $defaultCallback;
 
     if( file_exists( $this->cacheFile ))
       $this->cache = json_decode( file_get_contents($this->cacheFile), true) ?? [];
@@ -63,8 +65,8 @@ class Scheduler
 
             $time = microtime(true) - $startTime;
 
-            if( isset($task['callback']))
-              $this->handleCallback($task['callback'], [
+            if( $this->defaultCallback)
+              $this->handleCallback( $this->defaultCallback, [
                 'response'  => $response,
                 'http_code' => $info['http_code'],
                 'time'      => round($time, 3),
@@ -97,8 +99,8 @@ class Scheduler
 
             $time = microtime(true) - $startTime;
             
-            if( isset($task['callback']))
-              $this->handleCallback($task['callback'], [
+            if( $this->defaultCallback)
+              $this->handleCallback( $this->defaultCallback, [
                 'output'    => $result['output'],
                 'return'    => $result['return'],
                 'time'      => round($time, 3),

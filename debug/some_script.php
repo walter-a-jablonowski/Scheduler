@@ -8,3 +8,5 @@ $return = [
   'status' => 'success',
   'timestamp' => time()
 ];
+
+?>

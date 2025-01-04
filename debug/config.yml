@@ -6,7 +6,6 @@ scheduler:
       param1: value1
       param2: value2
     interval: 5sec
-    callback: log.php
 
   - type:       URL
     name:       http://example.com/quick-sync
@@ -14,7 +13,6 @@ scheduler:
       action:   sync
       mode:     quick
     interval:   5sec
-    callback:   log.php
     likeliness: 50
 
   - type:       URL
@@ -22,4 +20,3 @@ scheduler:
     args:
       format:   json
     interval:   10sec
-    callback:   log.php

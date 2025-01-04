@@ -7,7 +7,8 @@ require_once '../Scheduler.php';
 
 $scheduler = new Scheduler(
   Yaml::parseFile('config.yml')['scheduler'],
-  'scheduler-cache.json'
+  'scheduler-cache.json',
+  'log.php'
 );
 
 echo "Running scheduler for 30 seconds...\n";
