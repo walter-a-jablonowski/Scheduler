@@ -1,43 +1,108 @@
 <?php
 
+if( !headers_sent())
+{
+  header('Content-Type: text/html; charset=utf-8');
+  ?>
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <style>
+      body {
+        font-family: monospace;
+        background: #f5f5f5;
+        padding: 20px;
+        margin: 0;
+      }
+      .task {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      }
+      .task-time {
+        color: #666;
+        font-size: 0.9em;
+      }
+      .config {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+      .args {
+        margin-left: 20px;
+      }
+      .result {
+        border-left: 3px solid #FFA500;
+        padding-left: 10px;
+        margin: 10px 0;
+      }
+      pre {
+        margin: 5px 0;
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+  <?php
+}
+
 function logTask( array $data): void
 {
-  $log = date('Y-m-d H:i:s') . " Task completed\n";
   $config = $data['config'];
-
-  $log .= "Config:\n";
-  $log .= "  Type:       {$config['type']}\n";
-  $log .= "  Name:       {$config['name']}\n";
-  $log .= "  Interval:   {$config['interval']}\n";
-
+  
+  echo "<div class='task'>\n";
+  echo "<div class='task-time'>" . date('Y-m-d H:i:s') . " Task completed</div>\n";
+  
+  echo "<div class='config'>\n";
+  echo "<strong>Type:</strong> {$config['type']}<br>\n";
+  echo "<strong>Name:</strong> {$config['name']}<br>\n";
+  echo "<strong>Interval:</strong> {$config['interval']}<br>\n";
+  
   if( !empty($config['args']))
   {
-    $log .= "  Args:\n";
+    echo "<div class='args'>\n";
+    echo "<strong>Args:</strong><br>\n";
     foreach( $config['args'] as $key => $value)
-      $log .= "    $key: $value\n";
+      echo "• $key: $value<br>\n";
+    echo "</div>\n";
   }
-
+  
   if( $config['likeliness'] < 100)
-    $log .= "  Likeliness: {$config['likeliness']}%\n";
-
-  $log .= "Time:       {$data['time']}s\n";
-
+    echo "<strong>Likeliness:</strong> {$config['likeliness']}%<br>\n";
+  echo "</div>\n";
+  
+  echo "<strong>Time:</strong> {$data['time']}s<br>\n";
+  
+  echo "<div class='result'>\n";
   // For URL tasks
   if( $config['type'] === 'URL')
   {
-    $log .= "HTTP Code:  {$data['http_code']}\n";
-    $log .= "Response:   " . substr($data['response'], 0, 100) . (strlen($data['response']) > 100 ? '...' : '') . "\n";
+    echo "<strong>HTTP Code:</strong> {$data['http_code']}<br>\n";
+    echo "<strong>Response:</strong><br>\n";
+    echo "<pre>" . htmlspecialchars(substr($data['response'], 0, 100)) . 
+         (strlen($data['response']) > 100 ? '...' : '') . "</pre>\n";
   }
   // For Script tasks
   else if( $config['type'] === 'Script')
   {
-    $log .= "Output:     " . substr($data['output'], 0, 100) . (strlen($data['output']) > 100 ? '...' : '') . "\n";
+    echo "<strong>Output:</strong><br>\n";
+    echo "<pre>" . htmlspecialchars($data['output']) . "</pre>\n";
     if( isset($data['return']))
-      $log .= "Return:     " . print_r($data['return'], true) . "\n";
+    {
+      echo "<strong>Return:</strong><br>\n";
+      echo "<pre>" . htmlspecialchars(print_r($data['return'], true)) . "</pre>\n";
+    }
   }
-
-  $log .= "\n";
-  file_put_contents( __DIR__ . '/scheduler.log', $log, FILE_APPEND);
+  echo "</div>\n";
+  echo "</div>\n";
+  
+  flush();
 }
 
 ?>
+</body>
+</html>
