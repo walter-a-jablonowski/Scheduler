@@ -27,4 +27,4 @@ Rename the field url to 'name', update the code where needed. Also add a field '
 
  --
 
-Now use the 5sec and 10sec intervals to improve try.php which is used for trying the class and debugging.
+Now we use the 5sec and 10sec intervals to improve try.php which is used for trying the class and debugging. We want try.php to run shortly so that we can see if the Scheduler works. Use a callback to produce some log output. I moved your log code to log.php. comfig.yml and log.php might need fixes.
