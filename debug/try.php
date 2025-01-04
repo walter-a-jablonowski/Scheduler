@@ -12,7 +12,7 @@ $scheduler = new Scheduler(
   'logTask'
 );
 
-echo "Running scheduler for 30 seconds...\n";
+echo "Running scheduler for 15 seconds...\n";
 $endTime = time() + 15;
 
 while( time() < $endTime )
