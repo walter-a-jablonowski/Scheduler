@@ -42,6 +42,7 @@ class Scheduler
         switch( $task['type'])
         {
           case 'URL':
+            
             $ch = curl_init( $task['url']);
             curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true);
             curl_exec( $ch );
@@ -49,13 +50,16 @@ class Scheduler
             break;
 
           case 'Script':
-            (function() use ($task)
-            {
-              if( !isset($task['url']))
+
+            ( function() use ($task) {
+              
+              if( ! isset($task['url']))
                 throw new Exception('Script path is not specified in url field: ' . $task['name']);
                 
               require $task['url'];
+
             })();
+          
             break;
 
           default:
