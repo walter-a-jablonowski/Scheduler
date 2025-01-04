@@ -140,7 +140,7 @@ class Scheduler
       $startDate = DateTime::createFromFormat('Y-m-d H:i:s', $task['startDate']);
       if( ! $startDate)
         throw new Exception("Invalid startDate format for task {$task['name']}, use YYYY-MM-DD HH:MM:SS");
-        
+      
       if( $now < $startDate)
         return false;
     }
