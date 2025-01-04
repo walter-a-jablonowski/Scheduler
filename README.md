@@ -49,15 +49,16 @@ $scheduler->run();
 - `interval`:   Time interval between runs
 - `likeliness`: (Optional) Percentage chance (1-100) of running when due
 - `callback`:   (Optional) Path to a PHP script that will be called after task execution
-  - Type URL
+  - Available variables in callback script:
     ```php
-    $response;   // Response body from the URL
-    $http_code;  // HTTP status code
-    $time;       // Run time
-    $url;        // Full URL that was called (including query parameters)
-    ```
-  - Type Script
-    ```php
-    $output;     // Captured output from the script
-    $return;     // Value of $return variable if set in the script
+    $config;    // Task configuration (type, name, args, interval, likeliness)
+    $time;      // Execution time in seconds
+
+    // For URL tasks
+    $response;  // Response body
+    $http_code; // HTTP status code
+
+    // For Script tasks
+    $output;    // Captured output
+    $return;    // Return value if set
     ```
