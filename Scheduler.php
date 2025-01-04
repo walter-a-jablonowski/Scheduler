@@ -29,6 +29,31 @@ class Scheduler
       $this->cache = json_decode( file_get_contents($this->cacheFile), true) ?? [];
     else
       $this->cache = [];
+
+    // Clear cache entry if startDate changed in config
+
+    foreach( $this->config as $task )
+    {
+      if( ! isset($task['name']))
+        continue;
+
+      $taskName = $task['name'];
+      
+      if( isset($this->cache[$taskName]))
+      {
+        $cacheStartDate  = isset($this->cache[$taskName]['startDate']) ? $this->cache[$taskName]['startDate'] : null;
+        $configStartDate = isset($task['startDate']) ? $task['startDate'] : null;
+          
+        if( $cacheStartDate !== $configStartDate)
+        {
+          unset($this->cache[$taskName]);
+          file_put_contents(
+            $this->cacheFile,
+            json_encode($this->cache, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+          );
+        }
+      }
+    }
   }
 
   public function run(): void
@@ -43,8 +68,8 @@ class Scheduler
         switch( $task['type'])
         {
           case 'URL':
-            $startTime = microtime(true);
 
+            $startTime = microtime(true);
             $url = $task['name'];
             
             if( isset($task['args']) && is_array($task['args']))
@@ -66,22 +91,25 @@ class Scheduler
             $time = microtime(true) - $startTime;
 
             if( $this->callback)
+              
               ($this->callback)([
                 'response'  => $response,
                 'http_code' => $info['http_code'],
                 'time'      => round($time, 3),
-                'config'    => [
-                  'type'      => $task['type'],
-                  'name'      => $task['name'],
-                  'args'      => isset($task['args']) ? $task['args'] : [],
-                  'startDate' => isset($task['startDate']) ? $task['startDate'] : null,
-                  'interval'  => $task['interval'],
-                  'likeliness'=> isset($task['likeliness']) ? $task['likeliness'] : 100
+                'config' => [
+                  'type'       => $task['type'],
+                  'name'       => $task['name'],
+                  'args'       => isset($task['args']) ? $task['args'] : [],
+                  'startDate'  => isset($task['startDate']) ? $task['startDate'] : null,
+                  'interval'   => $task['interval'],
+                  'likeliness' => isset($task['likeliness']) ? $task['likeliness'] : 100
                 ]
               ]);
+
             break;
 
           case 'Script':
+
             $result = null;
             $startTime = microtime(true);
             
@@ -101,26 +129,33 @@ class Scheduler
             $time = microtime(true) - $startTime;
             
             if( $this->callback)
+              
               ($this->callback)([
-                'output'    => $result['output'],
-                'return'    => $result['return'],
-                'time'      => round($time, 3),
-                'config'    => [
-                  'type'      => $task['type'],
-                  'name'      => $task['name'],
-                  'args'      => isset($task['args']) ? $task['args'] : [],
-                  'startDate' => isset($task['startDate']) ? $task['startDate'] : null,
-                  'interval'  => $task['interval'],
-                  'likeliness'=> isset($task['likeliness']) ? $task['likeliness'] : 100
+                'output' => $result['output'],
+                'return' => $result['return'],
+                'time'   => round($time, 3),
+                'config' => [
+                  'type'       => $task['type'],
+                  'name'       => $task['name'],
+                  'args'       => isset($task['args']) ? $task['args'] : [],
+                  'startDate'  => isset($task['startDate']) ? $task['startDate'] : null,
+                  'interval'   => $task['interval'],
+                  'likeliness' => isset($task['likeliness']) ? $task['likeliness'] : 100
                 ]
               ]);
+
             break;
 
           default:
             throw new Exception('Invalid task type: ' . $task['type']);
         }
 
-        $this->cache[ $task['name']] = (new DateTime())->format('Y-m-d H:i:s');
+        // Update cache with last run time and startDate
+        $this->cache[ $task['name']] = [
+          'lastRun'   => (new DateTime())->format('Y-m-d H:i:s'),
+          'startDate' => isset($task['startDate']) ? $task['startDate'] : null
+        ];
+        
         file_put_contents( 
           $this->cacheFile, 
           json_encode($this->cache, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
@@ -139,14 +174,14 @@ class Scheduler
     {
       $startDate = DateTime::createFromFormat('Y-m-d H:i:s', $task['startDate']);
       if( ! $startDate)
-        throw new Exception("Invalid startDate format for task {$task['name']}, use YYYY-MM-DD HH:MM:SS");
-      
+        throw new Exception("Invalid startDate format for task $task[name], use YYYY-MM-DD HH:MM:SS");
+
       if( $now < $startDate)
         return false;
     }
 
-    $lastRun = isset( $this->cache[$task['name']]) 
-      ? DateTime::createFromFormat('Y-m-d H:i:s', $this->cache[$task['name']])
+    $lastRun = isset($this->cache[ $task['name']]) 
+      ? DateTime::createFromFormat('Y-m-d H:i:s', $this->cache[ $task['name']]['lastRun'])
       : null;
 
     // Likeliness
