@@ -16,3 +16,7 @@ The list of time intervals might be extended later, so I'd suggest that we calcu
 Implement the scheduler script as a class.
 
 Indent all codes with 2 spaces and put the { on the next line. Write no space behind conditions of loop but the bracket and then a space like "if( ..."
+
+ --
+
+In config.yml add a type field per scheduler task. Types are 'URL' and 'Script'. In Scheduler class in the run method add a switch case for each type below shouldRunTask. We already have he code for the url case. Add the script case which is a of anonym function to have a new scope and in there perform a require.

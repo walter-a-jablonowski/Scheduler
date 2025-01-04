@@ -36,6 +36,33 @@ $scheduler->run();
 ## Configuration Options
 
 - `name`: Unique identifier for the task
-- `url`: The URL to call when the task is due
+- `type`: Type of task ('URL' or 'Script')
+- `url`: For URL tasks: The URL to call. For Script tasks: Path to the PHP script to execute
 - `interval`: Time interval between runs
 - `likeliness`: (Optional) Percentage chance (1-100) of running when due. If not set, task always runs when due
+
+## Task Types
+
+### URL Tasks
+Tasks that make HTTP requests to specified URLs:
+
+```yaml
+scheduler:
+  - name: daily_backup
+    type: URL
+    url: http://example.com/daily-backup
+    interval: daily
+```
+
+### Script Tasks
+Tasks that execute local PHP scripts:
+
+```yaml
+scheduler:
+  - name: local_cleanup
+    type: Script
+    url: /path/to/cleanup.php
+    interval: daily
+```
+
+The script will be executed in its own scope to prevent variable conflicts.

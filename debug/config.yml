@@ -1,5 +1,10 @@
 scheduler:
 
+  # - name: my_script_task
+  #   type: Script
+  #   url: /path/to/your/script.php
+  #   interval: hourly
+
   - name: quick_sync
     type: URL
     url: http://example.com/quick-sync
