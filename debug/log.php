@@ -1,6 +1,6 @@
 <?php
 
-if( !headers_sent())
+if( ! headers_sent())
 {
   header('Content-Type: text/html; charset=utf-8');
   ?>
