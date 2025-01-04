@@ -18,7 +18,7 @@ $endTime = time() + 15;
 while( time() < $endTime )
 {
   $scheduler->run();
-  sleep(1);  // Wait 1 second between checks
+  sleep(1);  // wait 1 second between checks
 }
 
 echo "Done\n";

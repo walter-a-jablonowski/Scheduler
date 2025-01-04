@@ -1,11 +1,12 @@
 scheduler:
 
-  - type:     Script
-    name:     some_script.php
+  - type:       Script
+    name:       some_script.php
     args:     
-      param1: value1
-      param2: value2
-    interval: 5sec
+      param1:   value1
+      param2:   value2
+    startDate:  2025-01-04 18:20:00
+    interval:   5sec
 
   - type:       URL
     name:       http://example.com/quick-sync

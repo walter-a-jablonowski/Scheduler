@@ -46,5 +46,6 @@ $scheduler->run();
 - `type`:       Type of task ('URL' or 'Script')
 - `name`:       Full URL without query parameters (URL tasks) or full path to the script
 - `args`:       (Optional) Named arguments (URL: converted to query parameters, Script: available as variables)
+- `startDate`:  (Optional) Start date and time in YYYY-MM-DD HH:MM:SS format, task will only run from this time onwards
 - `interval`:   Time interval between runs
 - `likeliness`: (Optional) Percentage chance (1-100) of running when due

@@ -74,6 +74,7 @@ class Scheduler
                   'type'      => $task['type'],
                   'name'      => $task['name'],
                   'args'      => isset($task['args']) ? $task['args'] : [],
+                  'startDate' => isset($task['startDate']) ? $task['startDate'] : null,
                   'interval'  => $task['interval'],
                   'likeliness'=> isset($task['likeliness']) ? $task['likeliness'] : 100
                 ]
@@ -108,6 +109,7 @@ class Scheduler
                   'type'      => $task['type'],
                   'name'      => $task['name'],
                   'args'      => isset($task['args']) ? $task['args'] : [],
+                  'startDate' => isset($task['startDate']) ? $task['startDate'] : null,
                   'interval'  => $task['interval'],
                   'likeliness'=> isset($task['likeliness']) ? $task['likeliness'] : 100
                 ]
@@ -129,10 +131,25 @@ class Scheduler
 
   private function shouldRunTask( array $task ): bool
   {
-    $now     = new DateTime();
+    $now = new DateTime();
+
+    // Check startDate
+
+    if( isset($task['startDate']))
+    {
+      $startDate = DateTime::createFromFormat('Y-m-d H:i:s', $task['startDate']);
+      if( ! $startDate)
+        throw new Exception("Invalid startDate format for task {$task['name']}, use YYYY-MM-DD HH:MM:SS");
+        
+      if( $now < $startDate)
+        return false;
+    }
+
     $lastRun = isset( $this->cache[$task['name']]) 
       ? DateTime::createFromFormat('Y-m-d H:i:s', $this->cache[$task['name']])
       : null;
+
+    // Likeliness
 
     $likely = true; 
 
