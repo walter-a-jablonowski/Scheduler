@@ -1,8 +1,7 @@
 # Scheduler
 
-All in one scheduler
+All in one scheduler: configure a single task in your system's scheduler instead of many (less config work)
 
-- configure a single task in your system's scheduler instead of many (less config work)
 - just run a single script that uses this class
 - configure multiple tasks in yml (syncable on multiple devices)
 - also supports advanced features like running a task based on likeliness
