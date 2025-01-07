@@ -65,6 +65,8 @@ class Scheduler
       if( ! isset($task['type'], $task['name'], $task['interval']))
         throw new Exception('Invalid task configuration: ' . json_encode($task));
 
+      // Decide run and run tasks per type
+
       if( $this->shouldRunTask($task))
       {
         switch( $task['type'])
@@ -95,7 +97,7 @@ class Scheduler
 
             $time = microtime(true) - $startTime;
 
-            if( $this->callback)
+            if( $this->callback)  // for debug use
               
               ($this->callback)([
                 'response'  => $response,
@@ -142,7 +144,8 @@ class Scheduler
 
             $time = microtime(true) - $startTime;
             
-            if( $this->callback)
+            if( $this->callback)  // for debug use
+
               ($this->callback)([
                 'output' => $result['output'],
                 'return' => $result['return'],
@@ -165,6 +168,7 @@ class Scheduler
         }
 
         // Update cache with last run time and startDate
+
         $this->cache[ $task['name']] = [
           'lastRun'   => (new DateTime())->format('Y-m-d H:i:s'),
           'startDate' => isset($task['startDate']) ? $task['startDate'] : null
