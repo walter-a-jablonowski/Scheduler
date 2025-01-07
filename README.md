@@ -7,7 +7,10 @@ All in one scheduler: configure a single task in your system's scheduler instead
 - also supports advanced features like running a task based on likeliness
 
 ```bash
-composer install
+> cd debug
+> composer install
+
+> composer require symfony/yaml
 ```
 
 ## Sample
@@ -65,3 +68,13 @@ scheduler:
 ## Debug out
 
 ![alt text](misc/img.png)
+
+
+LICENSE
+----------------------------------------------------------
+
+Copyright (C) Walter A. Jablonowski 2024, free under MIT [License](LICENSE)
+
+This app is build upon PHP and free software (see [credits](credits.md))
+
+[Privacy](https://walter-a-jablonowski.github.io/privacy.html) | [Legal](https://walter-a-jablonowski.github.io/imprint.html)
