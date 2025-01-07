@@ -26,7 +26,7 @@ try  {
   $scheduler->run();
 }
 catch( Exception $e ) {
-  error_log("Scheduler error: " . $e->getMessage());  // or use your own logging
+  error_log("Scheduler error: " . $e->getMessage());
   exit();
 }
 ```
