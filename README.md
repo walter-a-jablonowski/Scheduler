@@ -35,7 +35,8 @@ catch( Exception $e ) {
 scheduler:
 
   - type:       URL
-    name:       http://example.com/quick-sync
+    name:       quick_sync
+    url:        http://example.com/quick-sync
     args:       
       action:   sync
       mode:     quick
@@ -43,11 +44,13 @@ scheduler:
     likeliness: 75    # 75% chance of running when due
 
   - type:       URL
-    name:       http://example.com/daily-backup
+    name:       daily_backup
+    url:        http://example.com/daily-backup
     interval:   daily
 
   - type:       Script
-    name:       /path/to/cleanup.php
+    name:       cleanup_task
+    file:       /path/to/cleanup.php
     args:     
       logLevel: debug
       mode:     full
@@ -57,7 +60,9 @@ scheduler:
 ## Fields
 
 - `type`:       Type of task ('URL' or 'Script')
-- `name`:       Full URL without query parameters (URL tasks) or full path to the script
+- `name`:       Unique identifier for the task (used for caching and reference)
+- `url`:        URL tasks only: The full URL without query parameters
+- `file`:       Script tasks only: Full path to the script file
 - `args`:       (Optional) Named arguments (URL: converted to query parameters, Script: available as variables)
 - `startDate`:  (Optional) YYYY-MM-DD HH:MM:SS task will only run from this time onwards (you may edit this at any time)
   - you may also set this when a task already has been run

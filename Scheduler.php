@@ -69,8 +69,11 @@ class Scheduler
         {
           case 'URL':
 
+            if( ! isset($task['url']))
+              throw new Exception('URL field is required for URL type tasks: ' . json_encode($task));
+
             $startTime = microtime(true);
-            $url = $task['name'];
+            $url = $task['url'];
             
             if( isset($task['args']) && is_array($task['args']))
             {
@@ -99,6 +102,7 @@ class Scheduler
                 'config' => [
                   'type'       => $task['type'],
                   'name'       => $task['name'],
+                  'url'        => $task['url'],
                   'args'       => isset($task['args']) ? $task['args'] : [],
                   'startDate'  => isset($task['startDate']) ? $task['startDate'] : null,
                   'interval'   => $task['interval'],
@@ -110,6 +114,9 @@ class Scheduler
 
           case 'Script':
 
+            if( ! isset($task['file']))
+              throw new Exception('File field is required for Script type tasks: ' . json_encode($task));
+
             $result = null;
             $startTime = microtime(true);
             
@@ -118,7 +125,7 @@ class Scheduler
               extract(['args' => isset($task['args']) ? $task['args'] : []], EXTR_SKIP);
               ob_start();
 
-              require $task['name'];
+              require $task['file'];
               $result = [
                 'output' => ob_get_clean(),
                 'return' => isset($return) ? $return : null
@@ -137,6 +144,7 @@ class Scheduler
                 'config' => [
                   'type'       => $task['type'],
                   'name'       => $task['name'],
+                  'file'       => $task['file'],
                   'args'       => isset($task['args']) ? $task['args'] : [],
                   'startDate'  => isset($task['startDate']) ? $task['startDate'] : null,
                   'interval'   => $task['interval'],

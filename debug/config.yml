@@ -1,7 +1,8 @@
 scheduler:
 
   - type:       Script
-    name:       some_script.php
+    name:       script_task
+    file:       some_script.php
     args:     
       param1:   value1
       param2:   value2
@@ -9,7 +10,8 @@ scheduler:
     interval:   5sec
 
   - type:       URL
-    name:       http://example.com/quick-sync
+    name:       quick_sync
+    url:        http://example.com/quick-sync
     args:       
       action:   sync
       mode:     quick
@@ -17,7 +19,8 @@ scheduler:
     likeliness: 50
 
   - type:       URL
-    name:       http://example.com/status-check
+    name:       status_check
+    url:        http://example.com/status-check
     args:
       format:   json
     interval:   10sec
