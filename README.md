@@ -17,17 +17,10 @@ All in one scheduler: configure a single task in your system's scheduler instead
 
 ```php
 $config    = Yaml::parseFile('config.yml');
-$scheduler = new Scheduler(
-  $config['scheduler'],
-  'cache.json', [
-    'user'    => '/home/username',  // placeholders for field file: {user}/file.txt
-    'scripts' => '/var/scripts'
-  ],
-  function($result) {
-    // Optional callback for logging
-    print_r($result);
-  }
-);
+$scheduler = new Scheduler( $config['scheduler'], 'cache.json', [
+  'user'    => '/home/username',  // placeholders for field file: {user}/file.txt
+  'scripts' => '/var/scripts'
+]);
 
 try  {
   $scheduler->run();
