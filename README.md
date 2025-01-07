@@ -17,7 +17,17 @@ All in one scheduler: configure a single task in your system's scheduler instead
 
 ```php
 $config    = Yaml::parseFile('config.yml');
-$scheduler = new Scheduler( $config['scheduler'], 'cache.json');
+$scheduler = new Scheduler(
+  $config['scheduler'],
+  'cache.json', [
+    'user'    => '/home/username',  // placeholders for field file: {user}/file.txt
+    'scripts' => '/var/scripts'
+  ],
+  function($result) {
+    // Optional callback for logging
+    print_r($result);
+  }
+);
 
 try  {
   $scheduler->run();
@@ -31,7 +41,6 @@ catch( Exception $e ) {
 **Config**
 
 ```yaml
-
 scheduler:
 
   - type:       URL
@@ -40,8 +49,8 @@ scheduler:
     args:       
       action:   sync
       mode:     quick
-    interval:   5min  # 5min, 10min, 30min, hourly, daily, weekly, monthly (5sec, 10sec used for debugging)
-    likeliness: 75    # 75% chance of running when due
+    interval:   5min                      # 5min, 10min, 30min, hourly, daily, weekly, monthly (5sec, 10sec used for debugging)
+    likeliness: 75                        # 75% chance of running when due
 
   - type:       URL
     name:       daily_backup
@@ -49,11 +58,8 @@ scheduler:
     interval:   daily
 
   - type:       Script
-    name:       cleanup_task
-    file:       /path/to/cleanup.php
-    args:     
-      logLevel: debug
-      mode:     full
+    name:       backup_task
+    file:       "{user}/backup/backup.php"  # {user} will be replaced
     interval:   daily
 ```
 
@@ -61,9 +67,8 @@ scheduler:
 
 - `type`:       Type of task ('URL' or 'Script')
 - `name`:       Unique identifier for the task (used for caching and reference)
-- `url`:        URL tasks only: The full URL without query parameters
-- `file`:       Script tasks only: Full path to the script file
-- `args`:       (Optional) Named arguments (URL: converted to query parameters, Script: available as variables)
+- `url`:        URL tasks only: The full URL without query parameters (supports placeholders)
+- `file`:       Script tasks only: Full path to the script file (supports placeholders)
 - `startDate`:  (Optional) YYYY-MM-DD HH:MM:SS task will only run from this time onwards (you may edit this at any time)
   - you may also set this when a task already has been run
 - `interval`:   Time interval between runs

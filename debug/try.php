@@ -8,7 +8,9 @@ require_once 'log.php';
 
 $scheduler = new Scheduler(
   Yaml::parseFile('config.yml')['scheduler'],
-  'scheduler-cache.json',
+  'scheduler-cache.json', [
+    'fld' => __DIR__ . '/sub'  // Current directory for script files
+  ],
   'logTask'
 );
 

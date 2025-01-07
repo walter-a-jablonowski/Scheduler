@@ -5,6 +5,7 @@ class Scheduler
   private string $cacheFile;
   private array  $config;
   private array  $cache;
+  private array  $placeholders;
   private $callback;
   
   private const INTERVALS = [
@@ -19,11 +20,12 @@ class Scheduler
     'monthly' => 2592000
   ];
 
-  public function __construct( array $config, string $cacheFile, callable $callback = null)
+  public function __construct( array $config, string $cacheFile, array $placeholders = [], callable $callback = null)
   {
-    $this->config    = $config;
-    $this->cacheFile = $cacheFile;
-    $this->callback  = $callback;
+    $this->config      = $config;
+    $this->cacheFile   = $cacheFile;
+    $this->placeholders = $placeholders;
+    $this->callback    = $callback;
 
     if( file_exists( $this->cacheFile ))
       $this->cache = json_decode( file_get_contents($this->cacheFile), true) ?? [];
@@ -77,12 +79,12 @@ class Scheduler
             
             if( isset($task['args']) && is_array($task['args']))
             {
-              $queryParams = [];
+              $query = [];
               foreach( $task['args'] as $key => $value)
-                $queryParams[] = urlencode($key) . '=' . urlencode($value);
+                $query[] = urlencode($key) . '=' . urlencode($value);
                 
-              if( !empty($queryParams))
-                $url .= (strpos($url, '?') === false ? '?' : '&') . implode('&', $queryParams);
+              if( ! empty($query))
+                $url .= (strpos($url, '?') === false ? '?' : '&') . implode('&', $query);
             }
             
             $ch = curl_init( $url);
@@ -117,15 +119,20 @@ class Scheduler
             if( ! isset($task['file']))
               throw new Exception('File field is required for Script type tasks: ' . json_encode($task));
 
-            $result = null;
+            $result    = null;
             $startTime = microtime(true);
+            $file      = $task['file'];
+
+            foreach( $this->placeholders as $placeholder => $value) 
+              $file = str_replace('{' . $placeholder . '}', $value, $file);
             
-            ( function() use ($task, &$result) {
+            ( function() use ($file, $task, &$result) {
 
               extract(['args' => isset($task['args']) ? $task['args'] : []], EXTR_SKIP);
               ob_start();
 
-              require $task['file'];
+              require $file;
+
               $result = [
                 'output' => ob_get_clean(),
                 'return' => isset($return) ? $return : null
@@ -136,7 +143,6 @@ class Scheduler
             $time = microtime(true) - $startTime;
             
             if( $this->callback)
-              
               ($this->callback)([
                 'output' => $result['output'],
                 'return' => $result['return'],
@@ -144,7 +150,7 @@ class Scheduler
                 'config' => [
                   'type'       => $task['type'],
                   'name'       => $task['name'],
-                  'file'       => $task['file'],
+                  'file'       => $file,
                   'args'       => isset($task['args']) ? $task['args'] : [],
                   'startDate'  => isset($task['startDate']) ? $task['startDate'] : null,
                   'interval'   => $task['interval'],

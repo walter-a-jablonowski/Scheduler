@@ -2,7 +2,7 @@ scheduler:
 
   - type:       Script
     name:       script_task
-    file:       some_script.php
+    file:       "{fld}/some_script.php"
     args:     
       param1:   value1
       param2:   value2
