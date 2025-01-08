@@ -65,7 +65,7 @@ scheduler:
 
 - `type`:       Type of task ('URL' or 'Script')
 - `name`:       Unique identifier for the task
-- `url`:        URL tasks only: Full URL without query (supports placeholders)
+- `url`:        URL tasks only: Full URL without query
 - `file`:       Script tasks only: Script file (supports placeholders)
 - `startDate`:  (Optional) YYYY-MM-DD HH:MM:SS task will only run from this time onwards
   - you may edit this at any time
