@@ -7,7 +7,7 @@ class Scheduler
   private array  $placeholders;
   private        $callback;
   
-  private array  $cache;
+  private array  $cache = [];
   
   private const INTERVALS = [
     '5sec'    => 5,       // used for debugging
@@ -30,8 +30,6 @@ class Scheduler
 
     if( file_exists( $this->cacheFile ))
       $this->cache = json_decode( file_get_contents($this->cacheFile), true) ?? [];
-    else
-      $this->cache = [];
 
     // Clear cache entry if startDate changed in config
 

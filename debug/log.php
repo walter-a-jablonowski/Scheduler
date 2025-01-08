@@ -58,9 +58,13 @@ function logTask( string $state, array $result, float $time, array $config ): vo
   echo "<div class='config'>\n";
   echo "<strong>Type:</strong> {$config['type']}<br>\n";
   echo "<strong>Name:</strong> {$config['name']}<br>\n";
-  echo "<strong>Interval:</strong> {$config['interval']}<br>\n";
-  
-  if( !empty($config['args']))
+
+  if( isset($config['file']))
+    echo "<strong>File:</strong> {$config['file']}<br>\n";
+  else if( isset($config['url']))
+    echo "<strong>URL:</strong> {$config['url']}<br>\n";
+
+  if( ! empty($config['args']))
   {
     echo "<div class='args'>\n";
     echo "<strong>Args:</strong><br>\n";
@@ -68,8 +72,13 @@ function logTask( string $state, array $result, float $time, array $config ): vo
       echo "• $key: $value<br>\n";
     echo "</div>\n";
   }
-  
-  if( $config['likeliness'] < 100)
+
+  if( isset($config['startDate']))
+    echo "<strong>Start Date:</strong> {$config['startDate']}<br>\n";
+
+  echo "<strong>Interval:</strong> {$config['interval']}<br>\n";
+
+  if( isset($config['likeliness']))
     echo "<strong>Likeliness:</strong> {$config['likeliness']}%<br>\n";
   echo "</div>\n";
   
