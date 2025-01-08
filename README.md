@@ -7,8 +7,12 @@ All in one scheduler: configure a single task in your system's scheduler instead
 - also supports advanced features like running a task based on likeliness
 
 ```bash
+# Demo
+
 > cd debug
 > composer install
+
+# Install
 
 > composer require symfony/yaml
 ```
@@ -59,10 +63,11 @@ scheduler:
 ## Fields
 
 - `type`:       Type of task ('URL' or 'Script')
-- `name`:       Unique identifier for the task (used for caching and reference)
-- `url`:        URL tasks only: The full URL without query parameters (supports placeholders)
-- `file`:       Script tasks only: Full path to the script file (supports placeholders)
-- `startDate`:  (Optional) YYYY-MM-DD HH:MM:SS task will only run from this time onwards (you may edit this at any time)
+- `name`:       Unique identifier for the task
+- `url`:        URL tasks only: Full URL without query (supports placeholders)
+- `file`:       Script tasks only: Script file (supports placeholders)
+- `startDate`:  (Optional) YYYY-MM-DD HH:MM:SS task will only run from this time onwards
+  - you may edit this at any time
   - you may also set this when a task already has been run
 - `interval`:   Time interval between runs
 - `likeliness`: (Optional) Percentage chance (1-100) of running when due
