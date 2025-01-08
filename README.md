@@ -1,12 +1,13 @@
 # Scheduler
 
-All in one scheduler: configure a single task in your system's scheduler instead of many (less config work)
+All in one scheduler
 
-- just run a single script that uses this class
+- just run a single script that uses this class in your system's scheduler (less config work)
 - configure multiple tasks in yml (syncable on multiple devices)
 - also supports advanced features like running a task based on likeliness
 
 ```bash
+
 # Demo
 
 > cd debug
