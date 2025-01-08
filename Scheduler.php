@@ -31,6 +31,11 @@ class Scheduler
     if( file_exists( $this->cacheFile ))
       $this->cache = json_decode( file_get_contents($this->cacheFile), true) ?? [];
 
+    // Validate tasks
+    
+    foreach( $this->config as $task )
+      $this->validateTask($task);
+
     // Clear cache entry if startDate changed in config
 
     foreach( $this->config as $task )
@@ -61,9 +66,6 @@ class Scheduler
   {
     foreach( $this->config as $task )
     {
-      if( ! isset($task['type'], $task['name'], $task['interval']))
-        throw new Exception('Invalid task configuration: ' . json_encode($task));
-
       // Decide run and run tasks per type
 
       if( $this->shouldRunTask($task))
@@ -176,9 +178,7 @@ class Scheduler
 
   private function runScript( array $task ) : void
   {
-    if( ! isset($task['file']))
-      throw new Exception('File field is required for Script type tasks: ' . json_encode($task));
-
+    $file      = $task['file'];
     $result    = null;
     $startTime = microtime(true);
 
@@ -188,6 +188,13 @@ class Scheduler
 
     foreach( $this->placeholders as $placeholder => $value) 
       $file = str_replace('{' . $placeholder . '}', $value, $file);
+
+    // Validate
+
+    if( ! file_exists($file))
+      throw new Exception("Script file not found: $file");
+    if( ! is_readable($file))
+      throw new Exception("Script file not readable: $file");
 
     // Call the script
     
@@ -229,9 +236,6 @@ class Scheduler
 
   private function runURL( array $task ) : void
   {
-    if( ! isset($task['url']))
-      throw new Exception('URL field is required for URL type tasks: ' . json_encode($task));
-
     $startTime = microtime(true);
     
     // Make url
@@ -253,9 +257,12 @@ class Scheduler
     $ch = curl_init( $url);
     curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true);
     $response = curl_exec( $ch );
-    $error = curl_error( $ch );
-    $info = curl_getinfo( $ch );
+    $error    = curl_error( $ch );
+    $info     = curl_getinfo( $ch );
     curl_close( $ch );
+
+    if( ! $response && $error )
+      throw new Exception("CURL error: $error");
 
     $time = microtime(true) - $startTime;
 
@@ -270,11 +277,26 @@ class Scheduler
           'http_code' => $info['http_code']
         ], $time, $task);
       else
-        ($this->callback)('success', [
-          'response' => $response,
-          'http_code' => $info['http_code']
-        ], $time, $task);
+      ($this->callback)('success', [
+        'response' => $response,
+        'http_code' => $info['http_code']
+      ], $time, $task);
     }
+  }
+
+  private function validateTask( array $task ): void
+  {
+    if( ! isset( $task['type'], $task['name'], $task['interval']))
+      throw new Exception('Missing required fields (type, name, interval): ' . json_encode($task));
+    
+    if( ! in_array($task['interval'], array_keys(self::INTERVALS)))
+      throw new Exception("Invalid interval: {$task['interval']}");
+      
+    if( $task['type'] === 'URL' && ! isset($task['url']))
+      throw new Exception('URL field is required for URL type tasks');
+      
+    if( $task['type'] === 'Script' && ! isset($task['file']))
+      throw new Exception('File field is required for Script type tasks');
   }
 }
 
