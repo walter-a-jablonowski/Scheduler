@@ -26,7 +26,7 @@ $config    = Yaml::parseFile('config.yml');
 $scheduler = new Scheduler( $config['scheduler'], 'cache.json', [
   'user'    => '/home/username',  // placeholders for field file: {user}/file.txt
   'scripts' => '/var/scripts'
-], 'myCallback');                 // runs when a task is finished with state = success|error
+], 'myCallback');                 // runs when a task is finished with state = success|error (see below)
 
 try  {
   $scheduler->run();
@@ -37,7 +37,12 @@ catch( Exception $e ) {
 }
 ```
 
-**Config**
+## Debug out
+
+![alt text](misc/img.png)
+
+
+## Config
 
 ```yaml
 
@@ -59,10 +64,10 @@ scheduler:
       action:   sync
       mode:     quick
     interval:   5sec
-    likeliness: 50                          # 75% chance of running when due
+    likeliness: 50                          # 50% chance of running when due
 ```
 
-## Fields
+**Fields**
 
 - `type`:       Type of task ('URL' or 'Script')
 - `name`:       Unique identifier for the task
@@ -70,15 +75,36 @@ scheduler:
 - `file`:       Script tasks only: Script file (supports placeholders)
 - `args`:       (Optional) Script args or query parameters
 - `startDate`:  (Optional) YYYY-MM-DD HH:MM:SS task will only run from this time onwards
-  - you may edit this at any time
-  - you may also set this when a task already has been run
+  - you may edit this at any time (when a task already has been run)
 - `interval`:   Time interval between runs
 - `likeliness`: (Optional) Percentage chance (1-100) of running when due
 
 
-## Debug out
+## Callback fields
 
-![alt text](misc/img.png)
+The callback function receives task execution results and is called after each task run. The result array contains:
+
+- `state`:  'success' or 'error'
+- `time`:   execution time in seconds
+- `config`: complete task configuration (see above)
+
+**URL tasks**
+
+- state = success
+  - `response`:  response body
+  - `http_code`: HTTP status code (200-399)
+- state = error
+  - `error`:     curl error or HTTP error message
+  - `response`:  response body if available
+  - `http_code`: HTTP status code (400+)
+
+**Script tasks**
+
+- state = success
+  - `output`: captured output (echo, print etc.)
+  - `return`: value of $return variable if set in script
+- state = error
+  - `error`:  exception message or PHP error
 
 
 LICENSE
