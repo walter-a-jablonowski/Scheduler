@@ -186,26 +186,38 @@ class Scheduler
     foreach( $this->placeholders as $placeholder => $value) 
       $file = str_replace('{' . $placeholder . '}', $value, $file);
     
-    ( function() use ($file, $task, &$result) {
+    try 
+    {
+      ( function() use ($file, $task, &$result) {
 
-      extract(['args' => isset($task['args']) ? $task['args'] : []], EXTR_SKIP);
-      ob_start();
+        extract(['args' => isset($task['args']) ? $task['args'] : []], EXTR_SKIP);
+        ob_start();
 
-      require $file;
+        require $file;
 
-      $result = [
-        'output' => ob_get_clean(),
-        'return' => isset($return) ? $return : null
-      ];
+        $result = [
+          'output' => ob_get_clean(),
+          'return' => isset($return) ? $return : null
+        ];
 
-    })();
+      })();
 
-    $time = microtime(true) - $startTime;
+      $time = microtime(true) - $startTime;
 
-    if( $this->callback )
-      $this->performCallback('success', ['output' => $result['output'], 'return' => $result['return']],
-        $time, $task
-      );
+      if( $this->callback )
+        $this->performCallback('success', ['output' => $result['output'], 'return' => $result['return']],
+          $time, $task
+        );
+    }
+    catch( Exception $e )
+    {
+      $time = microtime(true) - $startTime;
+      
+      if( $this->callback )
+        $this->performCallback('error', ['error' => $e->getMessage()],
+          $time, $task
+        );
+    }
   }
 
   private function runURL( array $task ) : void
@@ -229,15 +241,26 @@ class Scheduler
     $ch = curl_init( $url);
     curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true);
     $response = curl_exec( $ch );
+    $error = curl_error( $ch );
     $info = curl_getinfo( $ch );
     curl_close( $ch );
 
     $time = microtime(true) - $startTime;
 
     if( $this->callback )
-      $this->performCallback('success', ['response' => $response, 'http_code' => $info['http_code']],
-        $time, $task
-      );
+    {
+      if( $error || $info['http_code'] >= 400 )
+        $this->performCallback('error', [
+          'error' => $error ?: 'HTTP error ' . $info['http_code'],
+          'response' => $response,
+          'http_code' => $info['http_code']
+        ], $time, $task);
+      else
+        $this->performCallback('success', [
+          'response' => $response,
+          'http_code' => $info['http_code']
+        ], $time, $task);
+    }
   }
 
   private function performCallback( string $state, array $result, int $time, array $task ) : void
