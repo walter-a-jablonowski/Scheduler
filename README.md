@@ -26,12 +26,10 @@ $config    = Yaml::parseFile('config.yml');
 $scheduler = new Scheduler( $config['scheduler'], 'cache.json', [
   'user'    => '/home/username',  // placeholders for field file: {user}/file.txt
   'scripts' => '/var/scripts'
-], 'myCallback');                 // runs when a task is finished (also for debug use)
-                                  // can be used to handle failed tasks, then use override below
+], 'myCallback');                 // runs when a task is finished with state = success|error
+
 try  {
-  $scheduler->run([
-    'quick_sync' => false         // optional override
-  ]);
+  $scheduler->run();
 }
 catch( Exception $e ) {
   error_log("Scheduler error: " . $e->getMessage());

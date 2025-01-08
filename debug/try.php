@@ -18,7 +18,7 @@ $endTime = time() + 15;
 while( time() < $endTime )
 {
   try  {
-    $scheduler->run();  // TASK: maybe try the overrides
+    $scheduler->run();
   }
   catch( Exception $e ) {
     error_log("Scheduler error: " . $e->getMessage());

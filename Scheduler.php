@@ -7,7 +7,6 @@ class Scheduler
   private array  $placeholders;
   private $callback;
   
-  private array  $taskOverrides;
   private array  $cache;
   
   private const INTERVALS = [
@@ -60,10 +59,8 @@ class Scheduler
     }
   }
 
-  public function run( array $taskOverrides = [] ) : void
+  public function run() : void
   {
-    $this->taskOverrides = $taskOverrides;
-
     foreach( $this->config as $task )
     {
       if( ! isset($task['type'], $task['name'], $task['interval']))
@@ -188,12 +185,6 @@ class Scheduler
 
   private function shouldRunTask( array $task ) : bool
   {
-    // Check task overrides
-
-    $taskName = $task['name'];
-    if( isset( $this->taskOverrides[$taskName] ))
-      return $this->taskOverrides[$taskName];
-
     $now = new DateTime();
 
     // Check startDate
