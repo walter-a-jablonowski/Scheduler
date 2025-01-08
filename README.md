@@ -8,6 +8,8 @@ All in one scheduler
 
 ## Usage
 
+Config see below or [sample](debug/config.yml)
+
 ```bash
 > composer require symfony/yaml
 ```
