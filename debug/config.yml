@@ -17,10 +17,3 @@ scheduler:
       mode:     quick
     interval:   5sec
     likeliness: 50
-
-  - type:       URL
-    name:       status_check
-    url:        http://example.com/status-check
-    args:
-      format:   json
-    interval:   10sec

@@ -45,24 +45,23 @@ catch( Exception $e ) {
 
 scheduler:
 
+  - type:       Script
+    name:       script_task
+    file:       "{user}/some_script.php"    # {user} will be replaced
+    args:     
+      param1:   value1
+      param2:   value2
+    # startDate: 2025-01-04 18:20:00
+    interval:   5sec                        # 5min, 10min, 30min, hourly, daily, weekly, monthly (5sec, 10sec used for debugging)
+
   - type:       URL
     name:       quick_sync
     url:        http://example.com/quick-sync
     args:       
       action:   sync
       mode:     quick
-    interval:   5min                        # 5min, 10min, 30min, hourly, daily, weekly, monthly (5sec, 10sec used for debugging)
-    likeliness: 75                          # 75% chance of running when due
-
-  - type:       URL
-    name:       daily_backup
-    url:        http://example.com/daily-backup
-    interval:   daily
-
-  - type:       Script
-    name:       backup_task
-    file:       "{user}/backup/backup.php"  # {user} will be replaced
-    interval:   daily
+    interval:   5sec
+    likeliness: 50                          # 75% chance of running when due
 ```
 
 ## Fields
