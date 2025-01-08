@@ -5,7 +5,7 @@ class Scheduler
   private array  $config;
   private string $cacheFile;
   private array  $placeholders;
-  private $callback;
+  private        $callback;
   
   private array  $cache;
   
@@ -73,101 +73,14 @@ class Scheduler
         switch( $task['type'])
         {
           case 'URL':
-
-            if( ! isset($task['url']))
-              throw new Exception('URL field is required for URL type tasks: ' . json_encode($task));
-
-            $startTime = microtime(true);
-            $url = $task['url'];
-            
-            if( isset($task['args']) && is_array($task['args']))
-            {
-              $query = [];
-              foreach( $task['args'] as $key => $value)
-                $query[] = urlencode($key) . '=' . urlencode($value);
-                
-              if( ! empty($query))
-                $url .= (strpos($url, '?') === false ? '?' : '&') . implode('&', $query);
-            }
-            
-            $ch = curl_init( $url);
-            curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true);
-            $response = curl_exec( $ch );
-            $info = curl_getinfo( $ch );
-            curl_close( $ch );
-
-            $time = microtime(true) - $startTime;
-
-            if( $this->callback )
-              
-              ($this->callback)([
-                'response'  => $response,
-                'http_code' => $info['http_code'],
-                'time'      => round($time, 3),
-                'config' => [
-                  'type'       => $task['type'],
-                  'name'       => $task['name'],
-                  'url'        => $task['url'],
-                  'args'       => isset($task['args']) ? $task['args'] : [],
-                  'startDate'  => isset($task['startDate']) ? $task['startDate'] : null,
-                  'interval'   => $task['interval'],
-                  'likeliness' => isset($task['likeliness']) ? $task['likeliness'] : 100
-                ]
-              ]);
-
-            break;
-
           case 'Script':
-
-            if( ! isset($task['file']))
-              throw new Exception('File field is required for Script type tasks: ' . json_encode($task));
-
-            $result    = null;
-            $startTime = microtime(true);
-            $file      = $task['file'];
-
-            foreach( $this->placeholders as $placeholder => $value) 
-              $file = str_replace('{' . $placeholder . '}', $value, $file);
-            
-            ( function() use ($file, $task, &$result) {
-
-              extract(['args' => isset($task['args']) ? $task['args'] : []], EXTR_SKIP);
-              ob_start();
-
-              require $file;
-
-              $result = [
-                'output' => ob_get_clean(),
-                'return' => isset($return) ? $return : null
-              ];
-
-            })();
-
-            $time = microtime(true) - $startTime;
-            
-            if( $this->callback )
-
-              ($this->callback)([
-                'output' => $result['output'],
-                'return' => $result['return'],
-                'time'   => round($time, 3),
-                'config' => [
-                  'type'       => $task['type'],
-                  'name'       => $task['name'],
-                  'file'       => $file,
-                  'args'       => isset($task['args']) ? $task['args'] : [],
-                  'startDate'  => isset($task['startDate']) ? $task['startDate'] : null,
-                  'interval'   => $task['interval'],
-                  'likeliness' => isset($task['likeliness']) ? $task['likeliness'] : 100
-                ]
-              ]);
-
+            $method = 'run' . $task['type'];
+            $this->$method( $task );
             break;
-
           default:
             throw new Exception('Invalid task type: ' . $task['type']);
         }
-
+        
         // Update cache with last run time and startDate
 
         $this->cache[ $task['name']] = [
@@ -259,5 +172,88 @@ class Scheduler
     }
 
     return ($now >= $nextRun) && $likely;
+  }
+
+  private function runScript( array $task ) : void
+  {
+    if( ! isset($task['file']))
+      throw new Exception('File field is required for Script type tasks: ' . json_encode($task));
+
+    $result    = null;
+    $startTime = microtime(true);
+    $file      = $task['file'];
+
+    foreach( $this->placeholders as $placeholder => $value) 
+      $file = str_replace('{' . $placeholder . '}', $value, $file);
+    
+    ( function() use ($file, $task, &$result) {
+
+      extract(['args' => isset($task['args']) ? $task['args'] : []], EXTR_SKIP);
+      ob_start();
+
+      require $file;
+
+      $result = [
+        'output' => ob_get_clean(),
+        'return' => isset($return) ? $return : null
+      ];
+
+    })();
+
+    $time = microtime(true) - $startTime;
+
+    if( $this->callback )
+      $this->performCallback(['output' => $result['output'], 'return' => $result['return']],
+        $time, $task
+      );
+  }
+
+  private function runURL( array $task ) : void
+  {
+    if( ! isset($task['url']))
+      throw new Exception('URL field is required for URL type tasks: ' . json_encode($task));
+
+    $startTime = microtime(true);
+    $url = $task['url'];
+    
+    if( isset($task['args']) && is_array($task['args']))
+    {
+      $query = [];
+      foreach( $task['args'] as $key => $value)
+        $query[] = urlencode($key) . '=' . urlencode($value);
+        
+      if( ! empty($query))
+        $url .= (strpos($url, '?') === false ? '?' : '&') . implode('&', $query);
+    }
+    
+    $ch = curl_init( $url);
+    curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true);
+    $response = curl_exec( $ch );
+    $info = curl_getinfo( $ch );
+    curl_close( $ch );
+
+    $time = microtime(true) - $startTime;
+
+    if( $this->callback )
+      $this->performCallback(['response'  => $response, 'http_code' => $info['http_code']],
+        $time, $task
+      );
+  }
+
+  private function performCallback( array $result, int $time, array $task ) : void
+  {
+    ($this->callback)(array_merge( $result, [
+      'time'   => round($time, 3),
+      'config' => [
+        'type'       => $task['type'],
+        'name'       => $task['name'],
+        'url'        => isset($task['url']) ? $task['url'] : null,
+        'file'       => isset($task['file']) ? $task['file'] : null,
+        'args'       => isset($task['args']) ? $task['args'] : [],
+        'startDate'  => isset($task['startDate']) ? $task['startDate'] : null,
+        'interval'   => $task['interval'],
+        'likeliness' => isset($task['likeliness']) ? $task['likeliness'] : 100
+      ]
+    ]));
   }
 }
