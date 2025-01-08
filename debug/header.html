@@ -39,6 +39,24 @@
       white-space: pre-wrap;
     }
   </style>
+  <script>
+    let lastScrolled = 0;
+    
+    function checkForNewContent() {
+      const now = Date.now();
+      if (now - lastScrolled > 100) {  // Throttle scrolling
+        const tasks = document.getElementsByClassName('task');
+        if (tasks.length > 0) {
+          const lastTask = tasks[tasks.length - 1];
+          lastTask.scrollIntoView({ behavior: 'smooth' });
+          lastScrolled = now;
+        }
+      }
+    }
+
+    // Check periodically for new content
+    setInterval(checkForNewContent, 200);
+  </script>
 </head>
 <body>
 
