@@ -2,11 +2,13 @@
 
 class Scheduler
 {
-  private string $cacheFile;
   private array  $config;
-  private array  $cache;
+  private string $cacheFile;
   private array  $placeholders;
   private $callback;
+  
+  private array  $taskOverrides;
+  private array  $cache;
   
   private const INTERVALS = [
     '5sec'    => 5,       // used for debugging
@@ -58,8 +60,10 @@ class Scheduler
     }
   }
 
-  public function run() : void
+  public function run( array $taskOverrides = [] ) : void
   {
+    $this->taskOverrides = $taskOverrides;
+
     foreach( $this->config as $task )
     {
       if( ! isset($task['type'], $task['name'], $task['interval']))
@@ -184,6 +188,12 @@ class Scheduler
 
   private function shouldRunTask( array $task ) : bool
   {
+    // Check task overrides
+
+    $taskName = $task['name'];
+    if( isset( $this->taskOverrides[$taskName] ))
+      return $this->taskOverrides[$taskName];
+
     $now = new DateTime();
 
     // Check startDate
