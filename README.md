@@ -21,7 +21,6 @@ All in one scheduler
 ## Sample
 
 ```php
-
 $config    = Yaml::parseFile('config.yml');
 $scheduler = new Scheduler( $config['scheduler'], 'cache.json', [
   'user'    => '/home/username',  // placeholders for field file: {user}/file.txt
@@ -45,7 +44,6 @@ catch( Exception $e ) {
 ## Config
 
 ```yaml
-
 scheduler:
 
   - type:       Script
