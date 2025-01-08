@@ -46,7 +46,7 @@ catch( Exception $e ) {
 
 ## Debug out
 
-![alt text](misc/img.png)
+![alt text](misc/img.gif)
 
 
 ## Config
