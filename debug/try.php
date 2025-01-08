@@ -30,7 +30,7 @@ $endTime = time() + 15;
 
 while( time() < $endTime )
 {
-  try  {
+  try {
     $scheduler->run();
   }
   catch( Exception $e ) {

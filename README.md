@@ -21,7 +21,7 @@ $scheduler = new Scheduler( $config['scheduler'], 'cache.json', [
   'scripts' => '/var/scripts'
 ], 'myCallback');                 // runs when a task is finished with state = success|error (see below)
 
-try  {
+try {
   $scheduler->run();
 }
 catch( Exception $e ) {
