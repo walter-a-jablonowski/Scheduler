@@ -131,7 +131,9 @@ class Scheduler
     }
 
     if( ! $lastRun )
-      return $likely;
+      return $likely;  // trie for first run if behind startDate, also use likliness
+
+    // Check interval
 
     $interval = $task['interval'];
     $nextRun  = clone $lastRun;
@@ -181,14 +183,19 @@ class Scheduler
 
     $result    = null;
     $startTime = microtime(true);
-    $file      = $task['file'];
+
+    // Placeholders
+    
+    $file = $task['file'];
 
     foreach( $this->placeholders as $placeholder => $value) 
       $file = str_replace('{' . $placeholder . '}', $value, $file);
+
+    // Call the script
     
     try 
     {
-      ( function() use ($file, $task, &$result) {
+      ( function() use ($file, $task, &$result) {  // new scope
 
         extract(['args' => isset($task['args']) ? $task['args'] : []], EXTR_SKIP);
         ob_start();
@@ -201,6 +208,8 @@ class Scheduler
         ];
 
       })();
+
+      // Success callback
 
       $time = microtime(true) - $startTime;
 
@@ -226,8 +235,11 @@ class Scheduler
       throw new Exception('URL field is required for URL type tasks: ' . json_encode($task));
 
     $startTime = microtime(true);
-    $url = $task['url'];
     
+    // Make url
+    
+    $url = $task['url'];
+
     if( isset($task['args']) && is_array($task['args']))
     {
       $query = [];
@@ -237,7 +249,9 @@ class Scheduler
       if( ! empty($query))
         $url .= (strpos($url, '?') === false ? '?' : '&') . implode('&', $query);
     }
-    
+
+    // Call the url
+
     $ch = curl_init( $url);
     curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true);
     $response = curl_exec( $ch );
@@ -246,6 +260,8 @@ class Scheduler
     curl_close( $ch );
 
     $time = microtime(true) - $startTime;
+
+    // Callback
 
     if( $this->callback )
     {
