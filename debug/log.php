@@ -50,10 +50,8 @@ if( ! headers_sent())
   <?php
 }
 
-function logTask( array $data): void
+function logTask( string $state, array $result, float $time, array $config ): void
 {
-  $config = $data['config'];
-  
   echo "<div class='task'>\n";
   echo "<div class='task-time'>" . date('Y-m-d H:i:s') . " Task completed</div>\n";
   
@@ -75,26 +73,26 @@ function logTask( array $data): void
     echo "<strong>Likeliness:</strong> {$config['likeliness']}%<br>\n";
   echo "</div>\n";
   
-  echo "<strong>Time:</strong> {$data['time']}s<br>\n";
+  echo "<strong>Time:</strong> " . round($time, 3) . "s<br>\n";
   
   echo "<div class='result'>\n";
   // For URL tasks
   if( $config['type'] === 'URL')
   {
-    echo "<strong>HTTP Code:</strong> {$data['http_code']}<br>\n";
+    echo "<strong>HTTP Code:</strong> {$result['http_code']}<br>\n";
     echo "<strong>Response:</strong><br>\n";
-    echo "<pre>" . htmlspecialchars(substr($data['response'], 0, 100)) . 
-         (strlen($data['response']) > 100 ? '...' : '') . "</pre>\n";
+    echo "<pre>" . htmlspecialchars(substr($result['response'], 0, 100)) . 
+         (strlen($result['response']) > 100 ? '...' : '') . "</pre>\n";
   }
   // For Script tasks
   else if( $config['type'] === 'Script')
   {
     echo "<strong>Output:</strong><br>\n";
-    echo "<pre>" . htmlspecialchars($data['output']) . "</pre>\n";
-    if( isset($data['return']))
+    echo "<pre>" . htmlspecialchars($result['output']) . "</pre>\n";
+    if( isset($result['return']))
     {
       echo "<strong>Return:</strong><br>\n";
-      echo "<pre>" . htmlspecialchars(print_r($data['return'], true)) . "</pre>\n";
+      echo "<pre>" . htmlspecialchars(print_r($result['return'], true)) . "</pre>\n";
     }
   }
   echo "</div>\n";
