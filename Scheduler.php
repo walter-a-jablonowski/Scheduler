@@ -280,7 +280,7 @@ class Scheduler
     }
   }
 
-  private function validateTask( array $task ): void
+  private function validateTask( array $task ) : void
   {
     if( ! isset( $task['type'], $task['name'], $task['interval']))
       throw new Exception('Missing required fields (type, name, interval): ' . json_encode($task));
