@@ -27,9 +27,11 @@ $scheduler = new Scheduler( $config['scheduler'], 'cache.json', [
   'user'    => '/home/username',  // placeholders for field file: {user}/file.txt
   'scripts' => '/var/scripts'
 ], 'myCallback');                 // runs when a task is finished (also for debug use)
-
+                                  // can be used to handle failed tasks, then use override below
 try  {
-  $scheduler->run();
+  $scheduler->run([
+    'quick_sync' => false         // optional override
+  ]);
 }
 catch( Exception $e ) {
   error_log("Scheduler error: " . $e->getMessage());
