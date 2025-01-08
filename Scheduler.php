@@ -123,10 +123,6 @@ class Scheduler
     if( isset($task['likeliness']))
     {
       $likeliness = (int) $task['likeliness'];
-      
-      if( $likeliness < 1 || $likeliness > 100)
-        throw new Exception("Likeliness must be between 1 and 100: $task[name]");
-        
       $likely = mt_rand(1, 100) <= $likeliness;
     }
 
@@ -191,7 +187,7 @@ class Scheduler
 
     // Validate
 
-    if( ! file_exists($file))
+    if( ! file_exists($file))  // do this here ins of construct
       throw new Exception("Script file not found: $file");
     if( ! is_readable($file))
       throw new Exception("Script file not readable: $file");
@@ -261,7 +257,7 @@ class Scheduler
     $info     = curl_getinfo( $ch );
     curl_close( $ch );
 
-    if( ! $response && $error )
+    if( ! $response && $error )  // do this here ins of construct
       throw new Exception("CURL error: $error");
 
     $time = microtime(true) - $startTime;
@@ -289,14 +285,44 @@ class Scheduler
     if( ! isset( $task['type'], $task['name'], $task['interval']))
       throw new Exception('Missing required fields (type, name, interval): ' . json_encode($task));
     
+    // type
+    if( ! in_array($task['type'], ['URL', 'Script']))
+      throw new Exception("Invalid task type: {$task['type']}");
+
+    // Type specific validation
+    if( $task['type'] === 'URL')
+    {
+      if( ! isset($task['url']))
+        throw new Exception('URL field is required for URL type tasks');
+      
+      if( ! filter_var($task['url'], FILTER_VALIDATE_URL))
+        throw new Exception("Invalid URL format: {$task['url']}");
+    }
+    else if( $task['type'] === 'Script')
+    {
+      if( ! isset($task['file']))
+        throw new Exception('File field is required for Script type tasks');
+    }
+
+    // startDate
+    if( isset($task['startDate']))
+    {
+      $startDate = DateTime::createFromFormat('Y-m-d H:i:s', $task['startDate']);
+      if( ! $startDate)
+        throw new Exception("Invalid startDate format for task {$task['name']}, use YYYY-MM-DD HH:MM:SS");
+    }
+
+    // interval
     if( ! in_array($task['interval'], array_keys(self::INTERVALS)))
       throw new Exception("Invalid interval: {$task['interval']}");
-      
-    if( $task['type'] === 'URL' && ! isset($task['url']))
-      throw new Exception('URL field is required for URL type tasks');
-      
-    if( $task['type'] === 'Script' && ! isset($task['file']))
-      throw new Exception('File field is required for Script type tasks');
+
+    // likeliness
+    if( isset($task['likeliness']))
+    {
+      $likeliness = (int) $task['likeliness'];
+      if( $likeliness < 1 || $likeliness > 100)
+        throw new Exception("Likeliness must be between 1 and 100 for task {$task['name']}");
+    }
   }
 }
 
