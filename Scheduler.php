@@ -97,7 +97,7 @@ class Scheduler
 
             $time = microtime(true) - $startTime;
 
-            if( $this->callback )  // for debug use
+            if( $this->callback )
               
               ($this->callback)([
                 'response'  => $response,
@@ -144,7 +144,7 @@ class Scheduler
 
             $time = microtime(true) - $startTime;
             
-            if( $this->callback )  // for debug use
+            if( $this->callback )
 
               ($this->callback)([
                 'output' => $result['output'],

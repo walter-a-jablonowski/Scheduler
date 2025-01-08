@@ -26,7 +26,7 @@ $config    = Yaml::parseFile('config.yml');
 $scheduler = new Scheduler( $config['scheduler'], 'cache.json', [
   'user'    => '/home/username',  // placeholders for field file: {user}/file.txt
   'scripts' => '/var/scripts'
-]);
+], 'myCallback');                 // runs when a task is finished (also for debug use)
 
 try  {
   $scheduler->run();
@@ -40,6 +40,7 @@ catch( Exception $e ) {
 **Config**
 
 ```yaml
+
 scheduler:
 
   - type:       URL
