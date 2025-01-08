@@ -6,19 +6,11 @@ All in one scheduler
 - configure multiple tasks in yml (syncable on multiple devices)
 - also supports advanced features like running a task based on likeliness
 
+## Usage
+
 ```bash
-
-# Demo
-
-> cd debug
-> composer install
-
-# Install
-
 > composer require symfony/yaml
 ```
-
-## Sample
 
 ```php
 $config    = Yaml::parseFile('config.yml');
@@ -36,8 +28,7 @@ catch( Exception $e ) {
 }
 ```
 
-
-## Usage
+**Error handling**
 
 - We assume that called scripts handle error cases themselfs
 - As a fallback we catch errors in Scheduler and trigger the callback with state = error
@@ -45,6 +36,11 @@ catch( Exception $e ) {
 
 
 ## Debug out
+
+```bash
+> cd debug
+> composer install
+```
 
 ![alt text](misc/img.gif)
 
