@@ -36,6 +36,14 @@ catch( Exception $e ) {
 }
 ```
 
+
+## Usage
+
+- We assume that called scripts handle error cases themselfs
+- As a fallback we catch errors in Scheduler and trigger the callback with state = error
+- Errors in Scheduler itself: handle via try catch or your own error handler
+
+
 ## Debug out
 
 ![alt text](misc/img.png)
