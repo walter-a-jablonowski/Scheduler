@@ -203,7 +203,7 @@ class Scheduler
     $time = microtime(true) - $startTime;
 
     if( $this->callback )
-      $this->performCallback(['output' => $result['output'], 'return' => $result['return']],
+      $this->performCallback('success', ['output' => $result['output'], 'return' => $result['return']],
         $time, $task
       );
   }
@@ -235,14 +235,15 @@ class Scheduler
     $time = microtime(true) - $startTime;
 
     if( $this->callback )
-      $this->performCallback(['response'  => $response, 'http_code' => $info['http_code']],
+      $this->performCallback('success', ['response' => $response, 'http_code' => $info['http_code']],
         $time, $task
       );
   }
 
-  private function performCallback( array $result, int $time, array $task ) : void
+  private function performCallback( string $state, array $result, int $time, array $task ) : void
   {
-    ($this->callback)(array_merge( $result, [
+    ($this->callback)( array_merge( $result, [
+      'state'  => $state,
       'time'   => round($time, 3),
       'config' => [
         'type'       => $task['type'],
