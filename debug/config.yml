@@ -2,7 +2,7 @@ scheduler:
 
   - type:       Script
     name:       script_task
-    file:       "{fld}/some_script.php"
+    file:       "{fld}/some_script.php"  # {user} will be replaced (see construct)
     args:     
       param1:   value1
       param2:   value2
@@ -16,4 +16,4 @@ scheduler:
       action:   sync
       mode:     quick
     interval:   5sec
-    likeliness: 50
+    likeliness: 50                       # 50% chance of running when due
