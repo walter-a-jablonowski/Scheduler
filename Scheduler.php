@@ -22,10 +22,10 @@ class Scheduler
 
   public function __construct( array $config, string $cacheFile, array $placeholders = [], callable $callback = null)
   {
-    $this->config      = $config;
-    $this->cacheFile   = $cacheFile;
+    $this->config       = $config;
+    $this->cacheFile    = $cacheFile;
     $this->placeholders = $placeholders;
-    $this->callback    = $callback;
+    $this->callback     = $callback;
 
     if( file_exists( $this->cacheFile ))
       $this->cache = json_decode( file_get_contents($this->cacheFile), true) ?? [];
@@ -43,22 +43,22 @@ class Scheduler
       
       if( isset($this->cache[$taskName]))
       {
-        $cacheStartDate  = isset($this->cache[$taskName]['startDate']) ? $this->cache[$taskName]['startDate'] : null;
-        $configStartDate = isset($task['startDate']) ? $task['startDate'] : null;
+        $cacheStartDate  = isset( $this->cache[$taskName]['startDate']) ? $this->cache[$taskName]['startDate'] : null;
+        $configStartDate = isset( $task['startDate']) ? $task['startDate'] : null;
           
         if( $cacheStartDate !== $configStartDate)
         {
           unset($this->cache[$taskName]);
           file_put_contents(
             $this->cacheFile,
-            json_encode($this->cache, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+            json_encode( $this->cache, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
           );
         }
       }
     }
   }
 
-  public function run(): void
+  public function run() : void
   {
     foreach( $this->config as $task )
     {
@@ -97,7 +97,7 @@ class Scheduler
 
             $time = microtime(true) - $startTime;
 
-            if( $this->callback)  // for debug use
+            if( $this->callback )  // for debug use
               
               ($this->callback)([
                 'response'  => $response,
@@ -144,7 +144,7 @@ class Scheduler
 
             $time = microtime(true) - $startTime;
             
-            if( $this->callback)  // for debug use
+            if( $this->callback )  // for debug use
 
               ($this->callback)([
                 'output' => $result['output'],
@@ -182,7 +182,7 @@ class Scheduler
     }
   }
 
-  private function shouldRunTask( array $task ): bool
+  private function shouldRunTask( array $task ) : bool
   {
     $now = new DateTime();
 

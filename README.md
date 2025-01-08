@@ -21,6 +21,7 @@ All in one scheduler
 ## Sample
 
 ```php
+
 $config    = Yaml::parseFile('config.yml');
 $scheduler = new Scheduler( $config['scheduler'], 'cache.json', [
   'user'    => '/home/username',  // placeholders for field file: {user}/file.txt
@@ -47,8 +48,8 @@ scheduler:
     args:       
       action:   sync
       mode:     quick
-    interval:   5min                      # 5min, 10min, 30min, hourly, daily, weekly, monthly (5sec, 10sec used for debugging)
-    likeliness: 75                        # 75% chance of running when due
+    interval:   5min                        # 5min, 10min, 30min, hourly, daily, weekly, monthly (5sec, 10sec used for debugging)
+    likeliness: 75                          # 75% chance of running when due
 
   - type:       URL
     name:       daily_backup
