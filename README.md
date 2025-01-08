@@ -37,7 +37,7 @@ catch( Exception $e ) {
 - Errors in Scheduler itself: handle via try catch or your own error handler
 
 
-## Debug out
+## Sample
 
 ```bash
 > cd debug
