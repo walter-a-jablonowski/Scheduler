@@ -41,7 +41,7 @@ while( time() < $endTime )
   sleep(1);  // wait 1 second between checks
 }
 
-echo "Done\n";
+echo "<script>window.autoScroll = false;</script>Done\n";
 
 
 function logTask( string $state, array $result, float $time, array $config ): void
@@ -50,7 +50,7 @@ function logTask( string $state, array $result, float $time, array $config ): vo
   ob_start();
   
   echo "<div class='task'>\n";
-  echo "<div class='task-time'>" . date('Y-m-d H:i:s') . " Task completed</div>\n";
+  echo "<div class='task-time'>" . date('Y-m-d H:i:s') . " Task started</div>\n";
   
   echo "<div class='config'>\n";
   echo "<strong>Type:</strong> {$config['type']}<br>\n";

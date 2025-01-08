@@ -96,7 +96,7 @@ function myCallback( string $state, array $result, float $time, array $task )
 
 - `state`:  'success' or 'error'
 - `time`:   execution time in seconds
-- `config`: complete task configuration (see above)
+- `config`: task configuration (see above)
 
 **URL tasks**
 

@@ -41,8 +41,11 @@
   </style>
   <script>
     let lastScrolled = 0;
+    window.autoScroll = true;
     
     function checkForNewContent() {
+      if (!window.autoScroll) return;
+      
       const now = Date.now();
       if (now - lastScrolled > 100) {  // Throttle scrolling
         const tasks = document.getElementsByClassName('task');
