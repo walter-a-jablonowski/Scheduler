@@ -214,7 +214,7 @@ class Scheduler
       $time = microtime(true) - $startTime;
 
       if( $this->callback )
-        $this->performCallback('success', ['output' => $result['output'], 'return' => $result['return']],
+        ($this->callback)('success', ['output' => $result['output'], 'return' => $result['return']],
           $time, $task
         );
     }
@@ -223,7 +223,7 @@ class Scheduler
       $time = microtime(true) - $startTime;
       
       if( $this->callback )
-        $this->performCallback('error', ['error' => $e->getMessage()],
+        ($this->callback)('error', ['error' => $e->getMessage()],
           $time, $task
         );
     }
@@ -266,34 +266,16 @@ class Scheduler
     if( $this->callback )
     {
       if( $error || $info['http_code'] >= 400 )
-        $this->performCallback('error', [
+        ($this->callback)('error', [
           'error' => $error ?: 'HTTP error ' . $info['http_code'],
           'response' => $response,
           'http_code' => $info['http_code']
         ], $time, $task);
       else
-        $this->performCallback('success', [
+        ($this->callback)('success', [
           'response' => $response,
           'http_code' => $info['http_code']
         ], $time, $task);
     }
-  }
-
-  private function performCallback( string $state, array $result, int $time, array $task ) : void
-  {
-    ($this->callback)( array_merge( $result, [
-      'state'  => $state,
-      'time'   => round($time, 3),
-      'config' => [
-        'type'       => $task['type'],
-        'name'       => $task['name'],
-        'url'        => isset($task['url']) ? $task['url'] : null,
-        'file'       => isset($task['file']) ? $task['file'] : null,
-        'args'       => isset($task['args']) ? $task['args'] : [],
-        'startDate'  => isset($task['startDate']) ? $task['startDate'] : null,
-        'interval'   => $task['interval'],
-        'likeliness' => isset($task['likeliness']) ? $task['likeliness'] : 100
-      ]
-    ]));
   }
 }

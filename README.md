@@ -88,7 +88,11 @@ scheduler:
 
 ## Callback fields
 
-The callback function receives task execution results and is called after each task run. The result array contains:
+The callback function receives task execution results with these arguments:
+
+```php
+function myCallback( string $state, array $result, float $time, array $task )
+```
 
 - `state`:  'success' or 'error'
 - `time`:   execution time in seconds
@@ -97,21 +101,20 @@ The callback function receives task execution results and is called after each t
 **URL tasks**
 
 - state = success
-  - `response`:  response body
-  - `http_code`: HTTP status code (200-399)
+  - `$result['response']`:  response body
+  - `$result['http_code']`: HTTP status code (200-399)
 - state = error
-  - `error`:     curl error or HTTP error message
-  - `response`:  response body if available
-  - `http_code`: HTTP status code (400+)
+  - `$result['error']`:     curl error or HTTP error message
+  - `$result['response']`:  response body if available
+  - `$result['http_code']`: HTTP status code (400+)
 
 **Script tasks**
 
 - state = success
-  - `output`: captured output (echo, print etc.)
-  - `return`: value of $return variable if set in script
+  - `$result['output']`: captured output (echo, print etc.)
+  - `$result['return']`: value of $return variable if set in script
 - state = error
-  - `error`:  exception message or PHP error
-
+  - `$result['error']`:  exception message or PHP error
 
 LICENSE
 ----------------------------------------------------------
