@@ -91,7 +91,7 @@ function logTask( string $state, array $result, float $time, array $config ): vo
          (strlen($result['response']) > 100 ? '...' : '') . "</pre>\n";
   }
   // For Script tasks
-  else if( $config['type'] === 'Script')
+  elseif( $config['type'] === 'Script')
   {
     echo "<strong>Output:</strong><br>\n";
     echo "<pre>" . htmlspecialchars($result['output']) . "</pre>\n";
@@ -100,6 +100,17 @@ function logTask( string $state, array $result, float $time, array $config ): vo
       echo "<strong>Return:</strong><br>\n";
       echo "<pre>" . htmlspecialchars(print_r($result['return'], true)) . "</pre>\n";
     }
+  }
+  // For Command tasks
+  elseif( $config['type'] === 'Command')
+  {
+    echo "<strong>Output:</strong><br>\n";
+    echo "<pre>" . htmlspecialchars($result['output']) . "</pre>\n";
+  }
+  // For Process tasks
+  elseif( $config['type'] === 'Process')
+  {
+    echo "<strong>Message:</strong> {$result['message']}<br>\n";
   }
   echo "</div>\n";
   echo "</div>\n";
