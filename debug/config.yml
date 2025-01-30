@@ -22,12 +22,12 @@ scheduler:
     name:       list_directory
     command:    dir
     args:
-      format:   "/B"                     # /B for bare format
-    interval:   5sec                     # For testing, normally this would be longer
+      format:   "/B"
+    interval:   5sec
     likeliness: 100
 
   - type:       Process                  # Task that runs independently
     name:       start_explorer
     command:    explorer.exe
-    interval:   10sec                    # For testing, normally this would be longer
+    interval:   10sec
     startDate:  "2025-01-30 02:15:00"

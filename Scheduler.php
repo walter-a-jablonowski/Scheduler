@@ -92,7 +92,7 @@ class Scheduler
         
         file_put_contents( 
           $this->cacheFile, 
-          json_encode($this->cache, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+          json_encode( $this->cache, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
         );
       }
     }
