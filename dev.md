@@ -2,6 +2,8 @@
 Own process
 ----------------------------------------------------------
 
+there are alternatives that wait for return value
+
 - `exec('start cmd.exe /k your_command');`
   - /k flag keeps the window open
 - `pclose(popen('start your_command', 'r'));`
