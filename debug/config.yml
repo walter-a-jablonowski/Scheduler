@@ -29,5 +29,5 @@ scheduler:
   - type:       Process                  # Task that runs independently
     name:       start_explorer
     command:    explorer.exe
-    interval:   10sec
     startDate:  "2025-01-30 02:15:00"
+    interval:   10sec
