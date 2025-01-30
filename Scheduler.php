@@ -74,6 +74,8 @@ class Scheduler
         {
           case 'URL':
           case 'Script':
+          case 'Process':
+          case 'Command':
             $method = 'run' . $task['type'];
             $this->$method( $task );
             break;
@@ -268,16 +270,78 @@ class Scheduler
     {
       if( $error || $info['http_code'] >= 400 )
         ($this->callback)('error', [
-          'error' => $error ?: 'HTTP error ' . $info['http_code'],
-          'response' => $response,
+          'error'     => $error ?: 'HTTP error ' . $info['http_code'],
+          'response'  => $response,
           'http_code' => $info['http_code']
         ], $time, $task);
       else
-      ($this->callback)('success', [
-        'response' => $response,
-        'http_code' => $info['http_code']
-      ], $time, $task);
+        ($this->callback)('success', [
+          'response'  => $response,
+          'http_code' => $info['http_code']
+        ], $time, $task);
     }
+  }
+
+  private function runCommand( array $task ) : void 
+  {
+    $command = $task['command'];
+    $args    = '';
+
+    if( isset($task['args']) && is_array($task['args'])) {
+      foreach( $task['args'] as $key => $value ) {
+        if( is_numeric($key))
+          $args .= " $value";  // for simple args like ['-v', '-f']
+        else
+          $args .= " $value";  // for named args like ['format' => '/B']
+      }
+    }
+    
+    $fullCommand = "$command$args";
+    
+    $output = [];
+    $returnVar = 0;
+    exec($fullCommand, $output, $returnVar);
+    
+    if( $this->callback )
+      call_user_func( $this->callback, 'command',
+        [
+          'output'    => implode("\n", $output),
+          'returnVar' => $returnVar
+        ],
+        microtime(true),
+        $task
+      );
+  }
+
+  private function runProcess( array $task ) : void 
+  {
+    $command = $task['command'];
+    $args    = '';
+
+    if( isset($task['args']) && is_array($task['args'])) {
+      foreach( $task['args'] as $key => $value ) {
+        if( is_numeric($key))
+          $args .= " $value";  // for simple args like ['-v', '-f']
+        else
+          $args .= " $value";  // for named args like ['format' => '/B']
+      }
+    }
+    
+    $fullCommand = "$command$args";
+    
+    // Start process without waiting
+
+    if( substr(php_uname(), 0, 7) == "Windows" )
+      pclose(popen("start /B " . $fullCommand, "r"));
+    else
+      exec($fullCommand . " > /dev/null 2>&1 &");
+    
+    if( $this->callback )
+      call_user_func( $this->callback, 'process',
+        ['message' => "Process started: $fullCommand"],
+        microtime(true),
+        $task
+      );
   }
 
   private function validateTask( array $task ) : void
@@ -286,7 +350,7 @@ class Scheduler
       throw new Exception('Missing required fields (type, name, interval): ' . json_encode($task));
     
     // type
-    if( ! in_array($task['type'], ['URL', 'Script']))
+    if( ! in_array($task['type'], ['URL', 'Script', 'Command', 'Process']))
       throw new Exception("Invalid task type: {$task['type']}");
 
     // Type specific validation
@@ -302,6 +366,11 @@ class Scheduler
     {
       if( ! isset($task['file']))
         throw new Exception('File field is required for Script type tasks');
+    }
+    else if( $task['type'] === 'Command' || $task['type'] === 'Process')
+    {
+      if( ! isset($task['command']))
+        throw new Exception('Command field is required for Command and Process type tasks');
     }
 
     // startDate

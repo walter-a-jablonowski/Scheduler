@@ -6,7 +6,7 @@ scheduler:
     args:     
       param1:   value1
       param2:   value2
-    # startDate: 2025-01-04 18:20:00
+    # startDate: "2025-01-04 18:20:00"
     interval:   5sec
 
   - type:       URL
@@ -17,3 +17,17 @@ scheduler:
       mode:     quick
     interval:   5sec
     likeliness: 50                       # 50% chance of running when due
+
+  - type:       Command                  # Task that waits for completion
+    name:       list_directory
+    command:    dir
+    args:
+      format:   "/B"                     # /B for bare format
+    interval:   5sec                     # For testing, normally this would be longer
+    likeliness: 100
+
+  - type:       Process                  # Task that runs independently
+    name:       start_explorer
+    command:    explorer.exe
+    interval:   10sec                    # For testing, normally this would be longer
+    startDate:  "2025-01-30 02:15:00"
