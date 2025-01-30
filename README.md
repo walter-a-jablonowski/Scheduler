@@ -6,6 +6,9 @@ All in one scheduler
 - configure multiple tasks in yml (syncable on multiple devices)
 - also supports advanced features like running a task based on likeliness
 
+dev info see [dev](dev.md)
+
+
 ## Usage
 
 Config see below or [sample](debug/config.yml)
@@ -91,6 +94,7 @@ function myCallback( string $state, array $result, float $time, array $task )
   - `$result['return']`: value of $return variable if set in script
 - state = error
   - `$result['error']`:  exception message or PHP error
+
 
 LICENSE
 ----------------------------------------------------------
