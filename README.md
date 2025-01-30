@@ -56,7 +56,7 @@ see [sample](debug/config.yml)
 
 - `type`:       Type of task ('URL' or 'Script')
 - `name`:       Unique identifier for the task
-- name of the command to run
+- command to run
   - `url`:      URL tasks only: Full URL without query
   - `file`:     Script tasks only: Script file (supports placeholders)
   - `command`:  Tasks of type Command or Process (standalone) only
