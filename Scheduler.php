@@ -286,9 +286,12 @@ class Scheduler
   {
     $command = $task['command'];
     $args    = '';
+    $time    = microtime(true);
 
-    if( isset($task['args']) && is_array($task['args'])) {
-      foreach( $task['args'] as $key => $value ) {
+    if( isset($task['args']) && is_array($task['args']))
+    {
+      foreach( $task['args'] as $key => $value )
+      {
         if( is_numeric($key))
           $args .= " $value";  // for simple args like ['-v', '-f']
         else
@@ -298,28 +301,38 @@ class Scheduler
     
     $fullCommand = "$command$args";
     
-    $output = [];
+    $output    = [];
     $returnVar = 0;
-    exec($fullCommand, $output, $returnVar);
+    exec( $fullCommand, $output, $returnVar);
     
     if( $this->callback )
-      call_user_func( $this->callback, 'command',
-        [
-          'output'    => implode("\n", $output),
-          'returnVar' => $returnVar
-        ],
-        microtime(true),
-        $task
-      );
+    {
+      if( $returnVar !== 0 )
+      {
+        ($this->callback)('error', [
+          'error'   => "Command failed with code $returnVar",
+          'output'  => implode("\n", $output)
+        ], $time, $task);
+      }
+      else
+      {
+        ($this->callback)('success', [
+          'output'  => implode("\n", $output)
+        ], $time, $task);
+      }
+    }
   }
 
   private function runProcess( array $task ) : void 
   {
     $command = $task['command'];
     $args    = '';
+    $time    = microtime(true);
 
-    if( isset($task['args']) && is_array($task['args'])) {
-      foreach( $task['args'] as $key => $value ) {
+    if( isset($task['args']) && is_array($task['args']))
+    {
+      foreach( $task['args'] as $key => $value )
+      {
         if( is_numeric($key))
           $args .= " $value";  // for simple args like ['-v', '-f']
         else
@@ -329,19 +342,30 @@ class Scheduler
     
     $fullCommand = "$command$args";
     
-    // Start process without waiting
+    try 
+    {
+      if( substr(php_uname(), 0, 7) == "Windows" )
+        pclose( popen("start /B " . $fullCommand, "r"));
+      else
+        exec( $fullCommand . " > /dev/null 2>&1 &");
 
-    if( substr(php_uname(), 0, 7) == "Windows" )
-      pclose(popen("start /B " . $fullCommand, "r"));
-    else
-      exec($fullCommand . " > /dev/null 2>&1 &");
-    
-    if( $this->callback )
-      call_user_func( $this->callback, 'process',
-        ['message' => "Process started: $fullCommand"],
-        microtime(true),
-        $task
-      );
+      if( $this->callback )
+      {
+        ($this->callback)('success', [
+          'message' => "Process started: $fullCommand"
+        ], $time, $task);
+      }
+    }
+    catch( Exception $e ) 
+    {
+      if( $this->callback )
+      {
+        ($this->callback)('error', [
+          'error'   => $e->getMessage(),
+          'command' => $fullCommand
+        ], $time, $task);
+      }
+    }
   }
 
   private function validateTask( array $task ) : void
