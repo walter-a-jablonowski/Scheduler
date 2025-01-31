@@ -301,6 +301,8 @@ class Scheduler
     
     $fullCommand = "$command$args";
     
+    // error_log("Command: $fullCommand");  // DEBUG
+
     $output    = [];
     $returnVar = 0;
     exec( $fullCommand, $output, $returnVar);
@@ -341,7 +343,9 @@ class Scheduler
     }
     
     $fullCommand = "$command$args";
-    
+
+    // error_log("Process: $fullCommand");  // DEBUG
+
     try 
     {
       if( substr(php_uname(), 0, 7) == "Windows" )
