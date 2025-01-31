@@ -7,7 +7,7 @@ require_once '../Scheduler.php';
 
 $config    = Yaml::parseFile('config.yml');
 $scheduler = new Scheduler( $config['scheduler'], 'scheduler-cache.json',
-  ['fld' => __DIR__ . '/sub' ],
+  ['fld' => __DIR__ . '/sub'],
   'logTask'
 );
 
