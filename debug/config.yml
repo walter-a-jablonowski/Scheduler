@@ -39,14 +39,15 @@ scheduler:
     command:    tar                            # sample: tar -czf debug/out.tar.gz debug/sub
     args:                                      #         tar -xf  debug/out.tar.gz
                                                # performance
-      speed:    "--use-compress-program=pigz"  # multi thread
-      # speed2: "--blocking-factor=64"         # increases read/write buffer size (default is 20, try 64 or 128)
+      speed:    "--use-compress-program=pigz"  # - multi thread
+      # speed2: "--blocking-factor=64"         # - increases read/write buffer size (default is 20, try 64 or 128)
       speed3:   "--preserve-permissions"
       speed4:   "--same-owner"
                                                # archive
-      flags:    "-czf"                         # c=create, z=gzip compression (or bzip2), f=file
+      flags:    "-czf"                         # - c=create, z=gzip compression (or bzip2), f=file
       dest:     "out.tar.gz"
       src:      "sub"                    
+
     interval:   5sec
 
   # unused
