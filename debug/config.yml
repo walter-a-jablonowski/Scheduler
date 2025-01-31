@@ -35,7 +35,7 @@ scheduler:
   # Backup samples
 
   - type:      Process
-    name:      backup_tar                      # should override existing files
+    name:      backup_tar                      # overrides existing files
     command:   tar                             # sample: tar -czf debug/out.tar.gz debug/sub
     args:                                      #         tar -xf  debug/out.tar.gz
                                                # performance
