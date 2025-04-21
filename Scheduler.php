@@ -80,7 +80,7 @@ class Scheduler
             $this->$method( $task );
             break;
           default:
-            throw new Exception('Invalid task type: ' . $task['type']);
+            throw new Exception("Invalid task type: $task[type]");
         }
         
         // Update cache with last run time and startDate
@@ -174,114 +174,6 @@ class Scheduler
     return ($now >= $nextRun) && $likely;
   }
 
-  private function runScript( array $task ) : void
-  {
-    $file      = $task['file'];
-    $result    = null;
-    $startTime = microtime(true);
-
-    // Placeholders
-    
-    $file = $task['file'];
-
-    foreach( $this->placeholders as $placeholder => $value) 
-      $file = str_replace('{' . $placeholder . '}', $value, $file);
-
-    // Validate
-
-    if( ! file_exists($file))  // do this here ins of construct
-      throw new Exception("Script file not found: $file");
-    if( ! is_readable($file))
-      throw new Exception("Script file not readable: $file");
-
-    // Call the script
-    
-    try 
-    {
-      ( function() use ($file, $task, &$result) {  // new scope
-
-        extract(['args' => isset($task['args']) ? $task['args'] : []], EXTR_SKIP);
-        ob_start();
-
-        require $file;
-
-        $result = [
-          'output' => ob_get_clean(),
-          'return' => isset($return) ? $return : null
-        ];
-
-      })();
-
-      // Success callback
-
-      $time = microtime(true) - $startTime;
-
-      if( $this->callback )
-        ($this->callback)('success', ['output' => $result['output'], 'return' => $result['return']],
-          $time, $task
-        );
-    }
-    catch( Exception $e )
-    {
-      $time = microtime(true) - $startTime;
-      
-      if( $this->callback )
-        ($this->callback)('error', ['error' => $e->getMessage()],
-          $time, $task
-        );
-    }
-  }
-
-  private function runURL( array $task ) : void
-  {
-    $startTime = microtime(true);
-    
-    // Make url
-    
-    $url = $task['url'];
-
-    if( isset($task['args']) && is_array($task['args']))
-    {
-      $query = [];
-      foreach( $task['args'] as $key => $value)
-        $query[] = urlencode($key) . '=' . urlencode($value);
-        
-      if( ! empty($query))
-        $url .= (strpos($url, '?') === false ? '?' : '&') . implode('&', $query);
-    }
-
-    // Call the url
-
-    $ch = curl_init( $url);
-    curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true);
-    $response = curl_exec( $ch );
-    $error    = curl_error( $ch );
-    $info     = curl_getinfo( $ch );
-    curl_close( $ch );
-
-    if( ! $response && $error )  // do this here ins of construct
-      throw new Exception("CURL error: $error");
-
-    $time = microtime(true) - $startTime;
-
-    // Callback
-
-    if( $this->callback )
-    {
-      if( $error || $info['http_code'] >= 400 )
-        ($this->callback)('error', [
-          'error'     => $error ?: 'HTTP error ' . $info['http_code'],
-          'response'  => $response,
-          'http_code' => $info['http_code']
-        ], $time, $task);
-      else
-        ($this->callback)('success', [
-          'response'  => $response,
-          'http_code' => $info['http_code']
-        ], $time, $task);
-    }
-  }
-
   private function runCommand( array $task ) : void 
   {
     $command = $task['command'];
@@ -372,6 +264,114 @@ class Scheduler
     }
   }
 
+  private function runURL( array $task ) : void
+  {
+    $startTime = microtime(true);
+    
+    // Make url
+    
+    $url = $task['url'];
+
+    if( isset($task['args']) && is_array($task['args']))
+    {
+      $query = [];
+      foreach( $task['args'] as $key => $value)
+        $query[] = urlencode($key) . '=' . urlencode($value);
+        
+      if( ! empty($query))
+        $url .= (strpos($url, '?') === false ? '?' : '&') . implode('&', $query);
+    }
+
+    // Call the url
+
+    $ch = curl_init( $url);
+    curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true);
+    $response = curl_exec( $ch );
+    $error    = curl_error( $ch );
+    $info     = curl_getinfo( $ch );
+    curl_close( $ch );
+
+    if( ! $response && $error )  // do this here ins of construct
+      throw new Exception("CURL error: $error");
+
+    $time = microtime(true) - $startTime;
+
+    // Callback
+
+    if( $this->callback )
+    {
+      if( $error || $info['http_code'] >= 400 )
+        ($this->callback)('error', [
+          'error'     => $error ?: 'HTTP error ' . $info['http_code'],
+          'response'  => $response,
+          'http_code' => $info['http_code']
+        ], $time, $task);
+      else
+        ($this->callback)('success', [
+          'response'  => $response,
+          'http_code' => $info['http_code']
+        ], $time, $task);
+    }
+  }
+  
+  private function runScript( array $task ) : void
+  {
+    $file      = $task['file'];
+    $result    = null;
+    $startTime = microtime(true);
+
+    // Placeholders
+    
+    $file = $task['file'];
+ 
+    foreach( $this->placeholders as $placeholder => $value) 
+      $file = str_replace('{' . $placeholder . '}', $value, $file);
+
+    // Validate
+
+    if( ! file_exists($file))  // do this here ins of construct
+      throw new Exception("Script file not found: $file");
+    if( ! is_readable($file))
+      throw new Exception("Script file not readable: $file");
+
+    // Call the script
+    
+    try 
+    {
+      ( function() use ($file, $task, &$result) {  // new scope
+
+        extract(['args' => isset($task['args']) ? $task['args'] : []], EXTR_SKIP);
+        ob_start();
+
+        require $file;
+
+        $result = [
+          'output' => ob_get_clean(),
+          'return' => isset($return) ? $return : null
+        ];
+
+      })();
+
+      // Success callback
+
+      $time = microtime(true) - $startTime;
+
+      if( $this->callback )
+        ($this->callback)('success', ['output' => $result['output'], 'return' => $result['return']],
+          $time, $task
+        );
+    }
+    catch( Exception $e )
+    {
+      $time = microtime(true) - $startTime;
+      
+      if( $this->callback )
+        ($this->callback)('error', ['error' => $e->getMessage()],
+          $time, $task
+        );
+    }
+  }
+  
   private function validateTask( array $task ) : void
   {
     if( ! isset( $task['type'], $task['name'], $task['interval']))

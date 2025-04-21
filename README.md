@@ -54,7 +54,11 @@ catch( Exception $e ) {
 
 see [sample](debug/config.yml)
 
-- `type`:       Type of task ('URL' or 'Script')
+- `type`:       Type of task ('Command', 'Process', 'URL' or 'Script')
+  - Command:    runs a command in the shell, returns output
+  - Process:    runs a process in the background, returns output
+  - URL:        calls an URL, returns response or HTTP error
+  - Script:     requires a script, returns output and contents of $return
 - `name`:       Unique identifier for the task
 - command to run
   - `url`:      URL tasks only: Full URL without query
