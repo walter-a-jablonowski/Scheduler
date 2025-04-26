@@ -62,6 +62,10 @@ see [sample](debug/config.yml)
 - `name`:       Unique identifier for the task
 - command to run
   - `command`:  Tasks of type Command or Process (standalone) only
+    - start minimized
+      ```yml
+      command: 'start /min "" "php myscript.php"'
+      ```
   - `url`:      URL tasks only: Full URL without query
   - `file`:     Script tasks only: Script file (supports placeholders)
 - `args`:       (Optional) Script args or query parameters
