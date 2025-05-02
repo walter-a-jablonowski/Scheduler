@@ -60,14 +60,14 @@ see [sample](debug/config.yml)
   - URL:        calls an URL, returns response or HTTP error
   - Script:     requires a script, returns output and contents of $return
 - `name`:       Unique identifier for the task
-- command to run
+- command to run (supports placeholders)
   - `command`:  Tasks of type Command or Process (standalone) only
     - start minimized
       ```yml
       command: 'start /min "" "php myscript.php"'
       ```
   - `url`:      URL tasks only: Full URL without query
-  - `file`:     Script tasks only: Script file (supports placeholders)
+  - `file`:     Script tasks only: Script file
 - `args`:       (Optional) Script args or query parameters
 - `startDate`:  (Optional) YYYY-MM-DD HH:MM:SS task will only run from this time onwards
   - you may edit this at any time (when a task already has been run)

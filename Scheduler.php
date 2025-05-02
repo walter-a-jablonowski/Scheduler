@@ -180,6 +180,13 @@ class Scheduler
     $args    = '';
     $time    = microtime(true);
 
+    // Placeholders
+
+    foreach( $this->placeholders as $placeholder => $value) 
+      $command = str_replace('{' . $placeholder . '}', $value, $command);
+
+    // Args
+
     if( isset($task['args']) && is_array($task['args']))
     {
       foreach( $task['args'] as $key => $value )
@@ -220,8 +227,15 @@ class Scheduler
   private function runProcess( array $task ) : void 
   {
     $command = $task['command'];
-    $args    = '';
-    $time    = microtime(true);
+    $args = '';
+    $time = microtime(true);
+
+    // Placeholders
+ 
+    foreach( $this->placeholders as $placeholder => $value) 
+      $command = str_replace('{' . $placeholder . '}', $value, $command);
+
+    // Args
 
     if( isset($task['args']) && is_array($task['args']))
     {
@@ -266,11 +280,15 @@ class Scheduler
 
   private function runURL( array $task ) : void
   {
+    $url = $task['url'];
     $startTime = microtime(true);
     
-    // Make url
-    
-    $url = $task['url'];
+    // Placeholders
+   
+    foreach( $this->placeholders as $placeholder => $value) 
+      $url = str_replace('{' . $placeholder . '}', $value, $url);
+
+    // Args
 
     if( isset($task['args']) && is_array($task['args']))
     {
@@ -322,8 +340,6 @@ class Scheduler
 
     // Placeholders
     
-    $file = $task['file'];
- 
     foreach( $this->placeholders as $placeholder => $value) 
       $file = str_replace('{' . $placeholder . '}', $value, $file);
 
