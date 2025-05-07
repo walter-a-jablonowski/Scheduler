@@ -205,8 +205,8 @@ class Scheduler
 
     $thisDir = getcwd();
     
-    if( isset($task['workingDir']) && is_dir($task['workingDir']))
-      chdir($task['workingDir']);
+    if( $workingDir && is_dir($workingDir))
+      chdir($workingDir);
       
     exec( $fullCommand, $output, $returnVar);
     chdir($thisDir);
@@ -259,8 +259,8 @@ class Scheduler
     {
       $thisDir = getcwd();
       
-      if( isset($task['workingDir']) && is_dir($task['workingDir']))
-        chdir($task['workingDir']);
+      if( $workingDir && is_dir($workingDir))
+        chdir($workingDir);
         
       if( substr(php_uname(), 0, 7) == 'Windows')
         pclose( popen('start /B ' . $fullCommand, 'r'));
@@ -379,8 +379,8 @@ class Scheduler
         $filePath = dirname($file);
         if( $filePath && $filePath !== '.' )
           chdir($filePath);
-        elseif( isset($task['workingDir']) && is_dir($task['workingDir']))
-          chdir($task['workingDir']);
+        elseif( $workingDir && is_dir($workingDir))
+          chdir($workingDir);
           
         require basename($file);
         chdir($thisDir);
