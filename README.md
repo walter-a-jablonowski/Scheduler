@@ -9,7 +9,7 @@ All in one scheduler
 
 ## Usage
 
-Config see below or [sample](debug/config.yml)
+Config see below
 
 ```bash
 > composer require symfony/yaml
@@ -37,7 +37,7 @@ $scheduler = new Scheduler( $config['scheduler'], 'cache.json', [
   // fallback err handling (ideally called tool does this)
 });
 
-// Delay, wait until OS is ready on startup
+// Delay, wait until apps are ready on system startup
 
 echo "Scheduler starting...\n";
 sleep( 2 * 60 );
