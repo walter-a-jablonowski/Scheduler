@@ -185,6 +185,9 @@ class Scheduler
     foreach( $this->placeholders as $placeholder => $value) 
       $command = str_replace('{' . $placeholder . '}', $value, $command);
 
+    foreach( $this->placeholders as $placeholder => $value) 
+      $workingDir = str_replace('{' . $placeholder . '}', $value, $workingDir);
+
     // Args
 
     if( isset($task['args']) && is_array($task['args']))
@@ -200,7 +203,6 @@ class Scheduler
 
     $thisDir = getcwd();
     
-    // Change to working directory if specified
     if( isset($task['workingDir']) && is_dir($task['workingDir']))
       chdir($task['workingDir']);
       
@@ -236,6 +238,9 @@ class Scheduler
     foreach( $this->placeholders as $placeholder => $value) 
       $command = str_replace('{' . $placeholder . '}', $value, $command);
 
+    foreach( $this->placeholders as $placeholder => $value) 
+      $workingDir = str_replace('{' . $placeholder . '}', $value, $workingDir);
+
     // Args
 
     if( isset($task['args']) && is_array($task['args']))
@@ -250,18 +255,13 @@ class Scheduler
     {
       $thisDir = getcwd();
       
-      // Change to working directory if specified
       if( isset($task['workingDir']) && is_dir($task['workingDir']))
         chdir($task['workingDir']);
         
       if( substr(php_uname(), 0, 7) == 'Windows')
-      {
         pclose( popen('start /B ' . $fullCommand, 'r'));
-      }
       else
-      {
         exec( $fullCommand . ' > /dev/null 2>&1 &');
-      }
       
       chdir($thisDir);
 
@@ -349,6 +349,9 @@ class Scheduler
     foreach( $this->placeholders as $placeholder => $value) 
       $file = str_replace('{' . $placeholder . '}', $value, $file);
 
+    foreach( $this->placeholders as $placeholder => $value) 
+      $workingDir = str_replace('{' . $placeholder . '}', $value, $workingDir);
+
     // Validate
 
     if( ! file_exists($file))  // do this here ins of construct
@@ -426,9 +429,8 @@ class Scheduler
         throw new Exception('Command field is required for Command and Process type tasks');
     }
     
-    // workingDir validation if provided
-    if( isset($task['workingDir']) && ! is_dir($task['workingDir']))
-      throw new Exception("Working directory does not exist: $task[workingDir]");
+    // Don't validate workingDir here as it might contain placeholders
+    // Will be validated at runtime
 
     // startDate
     if( isset($task['startDate']))
