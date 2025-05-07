@@ -200,11 +200,13 @@ class Scheduler
     
     $fullCommand = "$command$args";
     
-    // error_log("Command: $fullCommand");  // DEBUG
-
     $output    = [];
     $returnVar = 0;
+
+    // $thisDir = getcwd();
+    // chdir( dirname($file));
     exec( $fullCommand, $output, $returnVar);
+    // chdir($thisDir);
     
     if( $this->callback )
     {
@@ -250,14 +252,22 @@ class Scheduler
     
     $fullCommand = "$command$args";
 
-    // error_log("Process: $fullCommand");  // DEBUG
-
     try 
     {
-      if( substr(php_uname(), 0, 7) == "Windows" )
-        pclose( popen("start /B " . $fullCommand, "r"));
+      if( substr(php_uname(), 0, 7) == 'Windows')
+      {
+        // $thisDir = getcwd();
+        // chdir( dirname($file));
+        pclose( popen('start /B ' . $fullCommand, 'r'));
+        // chdir($thisDir);
+      }
       else
-        exec( $fullCommand . " > /dev/null 2>&1 &");
+      {
+        // $thisDir = getcwd();
+        // chdir( dirname($file));
+        exec( $fullCommand . ' > /dev/null 2>&1 &');
+        // chdir($thisDir);
+      }
 
       if( $this->callback )
       {
@@ -359,7 +369,10 @@ class Scheduler
         extract(['args' => isset($task['args']) ? $task['args'] : []], EXTR_SKIP);
         ob_start();
 
-        require $file;
+        $thisDir = getcwd();
+        chdir( dirname($file));
+        require basename($file);
+        chdir($thisDir);
 
         $result = [
           'output' => ob_get_clean(),
@@ -395,7 +408,7 @@ class Scheduler
     
     // type
     if( ! in_array($task['type'], ['URL', 'Script', 'Command', 'Process']))
-      throw new Exception("Invalid task type: {$task['type']}");
+      throw new Exception("Invalid task type: $task[type]");
 
     // Type specific validation
     if( $task['type'] === 'URL')
@@ -404,7 +417,7 @@ class Scheduler
         throw new Exception('URL field is required for URL type tasks');
       
       if( ! filter_var($task['url'], FILTER_VALIDATE_URL))
-        throw new Exception("Invalid URL format: {$task['url']}");
+        throw new Exception("Invalid URL format: $task[url]");
     }
     else if( $task['type'] === 'Script')
     {
@@ -422,19 +435,19 @@ class Scheduler
     {
       $startDate = DateTime::createFromFormat('Y-m-d H:i:s', $task['startDate']);
       if( ! $startDate)
-        throw new Exception("Invalid startDate format for task {$task['name']}, use YYYY-MM-DD HH:MM:SS");
+        throw new Exception("Invalid startDate format for task $task[name], use YYYY-MM-DD HH:MM:SS");
     }
 
     // interval
     if( ! in_array($task['interval'], array_keys(self::INTERVALS)))
-      throw new Exception("Invalid interval: {$task['interval']}");
+      throw new Exception("Invalid interval: $task[interval]");
 
     // likeliness
     if( isset($task['likeliness']))
     {
       $likeliness = (int) $task['likeliness'];
       if( $likeliness < 1 || $likeliness > 100)
-        throw new Exception("Likeliness must be between 1 and 100 for task {$task['name']}");
+        throw new Exception("Likeliness must be between 1 and 100 for task $task[name]");
     }
   }
 }
