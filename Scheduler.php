@@ -203,10 +203,10 @@ class Scheduler
     $output    = [];
     $returnVar = 0;
 
-    // $thisDir = getcwd();
-    // chdir( dirname($file));
+    $thisDir = getcwd();
+    // chdir( dirname($file));  // TASK: currently using chdir(__DIR__) in called script, alternative: parse out but may be tricky
     exec( $fullCommand, $output, $returnVar);
-    // chdir($thisDir);
+    chdir($thisDir);
     
     if( $this->callback )
     {
@@ -256,17 +256,17 @@ class Scheduler
     {
       if( substr(php_uname(), 0, 7) == 'Windows')
       {
-        // $thisDir = getcwd();
-        // chdir( dirname($file));
+        $thisDir = getcwd();
+        // chdir( dirname($file));  // TASK: currently using chdir(__DIR__) in called script, alternative: parse out but may be tricky
         pclose( popen('start /B ' . $fullCommand, 'r'));
-        // chdir($thisDir);
+        chdir($thisDir);
       }
       else
       {
-        // $thisDir = getcwd();
+        $thisDir = getcwd();
         // chdir( dirname($file));
         exec( $fullCommand . ' > /dev/null 2>&1 &');
-        // chdir($thisDir);
+        chdir($thisDir);
       }
 
       if( $this->callback )

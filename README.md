@@ -56,7 +56,9 @@ see [sample](debug/config.yml)
 
 - `type`:       Type of task ('Command', 'Process', 'URL' or 'Script')
   - Command:    runs a command in the shell, returns output
+    - currently working dir needs to be set in called script `chdir(__DIR__)` 
   - Process:    runs a process in the background, returns output
+    - currently working dir needs to be set in called script `chdir(__DIR__)` 
   - URL:        calls an URL, returns response or HTTP error
   - Script:     requires a script, returns output and contents of $return
 - `name`:       Unique identifier for the task
