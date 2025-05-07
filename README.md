@@ -68,7 +68,8 @@ see [sample](debug/config.yml)
       ```
   - `url`:      URL tasks only: Full URL without query
   - `file`:     Script tasks only: Script file
-- `workingDir`: (Optional) supports placeholders, for all task types except URL
+- `workingDir`: (Optional) required if the called tool needs it (supports placeholders)
+  - for all task types except URL
   - if unspecified, the current directory will be used
 - `args`:       (Optional) Script args or query parameters
   - args may be numeric array or have keys (just for information)
