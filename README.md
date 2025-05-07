@@ -71,6 +71,7 @@ see [sample](debug/config.yml)
   - `url`:      URL tasks only: Full URL without query
   - `file`:     Script tasks only: Script file
 - `args`:       (Optional) Script args or query parameters
+  - args may be numeric array or have keys (just for information)
 - `startDate`:  (Optional) YYYY-MM-DD HH:MM:SS task will only run from this time onwards
   - you may edit this at any time (when a task already has been run)
 - `interval`:   Time interval between runs: 5min, 10min, 30min, hourly, daily, weekly, monthly (5sec, 10sec used for debugging)

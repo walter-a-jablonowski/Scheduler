@@ -190,12 +190,7 @@ class Scheduler
     if( isset($task['args']) && is_array($task['args']))
     {
       foreach( $task['args'] as $key => $value )
-      {
-        if( is_numeric($key))
-          $args .= " $value";  // for simple args like ['-v', '-f']
-        else
-          $args .= " $value";  // for named args like ['format' => '/B']
-      }
+        $args .= " $value";  // args may be numeric array or have keys (just for information)
     }
     
     $fullCommand = "$command$args";
