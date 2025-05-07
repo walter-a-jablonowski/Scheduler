@@ -176,17 +176,19 @@ class Scheduler
 
   private function runCommand( array $task ) : void 
   {
-    $command = $task['command'];
-    $args    = '';
-    $time    = microtime(true);
+    $command    = $task['command'];
+    $workingDir = $task['workingDir'] ?? null;
+    $args       = '';
+    $time       = microtime(true);
 
     // Placeholders
 
     foreach( $this->placeholders as $placeholder => $value) 
       $command = str_replace('{' . $placeholder . '}', $value, $command);
 
-    foreach( $this->placeholders as $placeholder => $value) 
-      $workingDir = str_replace('{' . $placeholder . '}', $value, $workingDir);
+    if( $workingDir )
+      foreach( $this->placeholders as $placeholder => $value) 
+        $workingDir = str_replace('{' . $placeholder . '}', $value, $workingDir);
 
     // Args
 
@@ -229,17 +231,19 @@ class Scheduler
 
   private function runProcess( array $task ) : void 
   {
-    $command = $task['command'];
-    $args = '';
-    $time = microtime(true);
+    $command    = $task['command'];
+    $workingDir = $task['workingDir'] ?? null;
+    $args       = '';
+    $time       = microtime(true);
 
     // Placeholders
  
     foreach( $this->placeholders as $placeholder => $value) 
       $command = str_replace('{' . $placeholder . '}', $value, $command);
 
-    foreach( $this->placeholders as $placeholder => $value) 
-      $workingDir = str_replace('{' . $placeholder . '}', $value, $workingDir);
+    if( $workingDir )
+      foreach( $this->placeholders as $placeholder => $value) 
+        $workingDir = str_replace('{' . $placeholder . '}', $value, $workingDir);
 
     // Args
 
@@ -340,17 +344,19 @@ class Scheduler
   
   private function runScript( array $task ) : void
   {
-    $file      = $task['file'];
-    $result    = null;
-    $startTime = microtime(true);
+    $file       = $task['file'];
+    $workingDir = $task['workingDir'] ?? null;
+    $result     = null;
+    $startTime  = microtime(true);
 
     // Placeholders
     
     foreach( $this->placeholders as $placeholder => $value) 
       $file = str_replace('{' . $placeholder . '}', $value, $file);
 
-    foreach( $this->placeholders as $placeholder => $value) 
-      $workingDir = str_replace('{' . $placeholder . '}', $value, $workingDir);
+    if( $workingDir )
+      foreach( $this->placeholders as $placeholder => $value) 
+        $workingDir = str_replace('{' . $placeholder . '}', $value, $workingDir);
 
     // Validate
 
