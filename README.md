@@ -56,9 +56,7 @@ see [sample](debug/config.yml)
 
 - `type`:       Type of task ('Command', 'Process', 'URL' or 'Script')
   - Command:    runs a command in the shell, returns output
-    - currently working dir needs to be set in called script `chdir(__DIR__)` 
   - Process:    runs a process in the background, returns output
-    - currently working dir needs to be set in called script `chdir(__DIR__)` 
   - URL:        calls an URL, returns response or HTTP error
   - Script:     requires a script, returns output and contents of $return
 - `name`:       Unique identifier for the task
@@ -70,6 +68,9 @@ see [sample](debug/config.yml)
       ```
   - `url`:      URL tasks only: Full URL without query
   - `file`:     Script tasks only: Script file
+- `workingDir`:  (Optional) Directory to run the command, process, or script from
+  - For Script tasks, if not specified, the script's directory will be used
+  - For Command and Process tasks, if not specified, the current directory will be used
 - `args`:       (Optional) Script args or query parameters
   - args may be numeric array or have keys (just for information)
 - `startDate`:  (Optional) YYYY-MM-DD HH:MM:SS task will only run from this time onwards

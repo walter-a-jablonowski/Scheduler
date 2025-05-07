@@ -199,7 +199,11 @@ class Scheduler
     $returnVar = 0;
 
     $thisDir = getcwd();
-    // chdir( dirname($file));  // TASK: currently using chdir(__DIR__) in called script, alternative: parse out but may be tricky
+    
+    // Change to working directory if specified
+    if( isset($task['workingDir']) && is_dir($task['workingDir']))
+      chdir($task['workingDir']);
+      
     exec( $fullCommand, $output, $returnVar);
     chdir($thisDir);
     
@@ -244,20 +248,22 @@ class Scheduler
 
     try 
     {
+      $thisDir = getcwd();
+      
+      // Change to working directory if specified
+      if( isset($task['workingDir']) && is_dir($task['workingDir']))
+        chdir($task['workingDir']);
+        
       if( substr(php_uname(), 0, 7) == 'Windows')
       {
-        $thisDir = getcwd();
-        // chdir( dirname($file));  // TASK: currently using chdir(__DIR__) in called script, alternative: parse out but may be tricky
         pclose( popen('start /B ' . $fullCommand, 'r'));
-        chdir($thisDir);
       }
       else
       {
-        $thisDir = getcwd();
-        // chdir( dirname($file));
         exec( $fullCommand . ' > /dev/null 2>&1 &');
-        chdir($thisDir);
       }
+      
+      chdir($thisDir);
 
       if( $this->callback )
       {
@@ -419,6 +425,10 @@ class Scheduler
       if( ! isset($task['command']))
         throw new Exception('Command field is required for Command and Process type tasks');
     }
+    
+    // workingDir validation if provided
+    if( isset($task['workingDir']) && ! is_dir($task['workingDir']))
+      throw new Exception("Working directory does not exist: $task[workingDir]");
 
     // startDate
     if( isset($task['startDate']))
