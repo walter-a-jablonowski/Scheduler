@@ -369,7 +369,13 @@ class Scheduler
         ob_start();
 
         $thisDir = getcwd();
-        chdir( dirname($file));
+        
+        $filePath = dirname($file);
+        if( $filePath && $filePath !== '.' )
+          chdir($filePath);
+        elseif( isset($task['workingDir']) && is_dir($task['workingDir']))
+          chdir($task['workingDir']);
+          
         require basename($file);
         chdir($thisDir);
 
