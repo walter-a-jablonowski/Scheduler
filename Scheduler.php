@@ -129,7 +129,7 @@ class Scheduler
     }
 
     if( ! $lastRun )
-      return $likely;  // trie for first run if behind startDate, also use likliness
+      return $likely;  // true for first run if behind startDate, also use likliness
 
     // Check interval
 
