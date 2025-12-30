@@ -223,7 +223,7 @@ class Scheduler
       else
       {
         ($this->callback)('success', [
-          'output'  => implode("\n", $output)
+          'output' => implode("\n", $output)
         ], $time, $task);
       }
     }

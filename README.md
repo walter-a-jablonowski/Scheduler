@@ -110,10 +110,33 @@ see [sample](debug/config.yml)
 The callback function receives task execution results with these arguments
 
 ```php
-function myCallback( string $state, array $result, float $time, array $task )
+function myCallback( string $state, array $result, float $time, array $config )
 ```
 
-- `state`:  'success' or 'error'
+- `state`: 'success' or 'error'
+- `result` keys:
+  - Command success
+    - output
+  - Command error
+    - error (message)
+    - output
+  - Process success
+    - message
+  - Process error
+    - error (message)
+    - command (full command)
+  - Run URL success
+    - response
+    - http_code
+  - Run URL error
+    - error (message)
+    - response
+    - http_code
+  - Script success
+    - output
+    - return
+  - Script error
+    - error (message)
 - `time`:   execution time in seconds
 - `config`: task configuration (see above)
 
