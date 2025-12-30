@@ -116,14 +116,14 @@ function myCallback( string $state, array $result, float $time, array $config )
 - `state`: 'success' or 'error'
 - `result` keys:
   - Command success
-    - output
+    - output (text)
   - Command error
     - error (message)
-    - output
+    - output (text)
   - Process success
-    - message
+    - message (process started msg)
   - Process error
-    - error (message)
+    - error (exception message)
     - command (full command)
   - Run URL success
     - response
@@ -133,10 +133,10 @@ function myCallback( string $state, array $result, float $time, array $config )
     - response
     - http_code
   - Script success
-    - output
-    - return
+    - output (echo)
+    - return (returned from script)
   - Script error
-    - error (message)
+    - error (exception message)
 - `time`:   execution time in seconds
 - `config`: task configuration (see above)
 
