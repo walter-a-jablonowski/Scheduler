@@ -5,7 +5,13 @@ use Symfony\Component\Yaml\Yaml;
 require_once 'vendor/autoload.php';
 require_once '../Scheduler.php';
 
-$config    = Yaml::parseFile('config.yml');
+$conf   = Yaml::parseFile('config.yml');
+$config = [];
+
+foreach( $conf as $group => $tasks )  // flatten config
+  foreach( $tasks as $task)
+    $config[] = $task;
+
 $scheduler = new Scheduler( $config, 'scheduler-cache.json',
   ['fld' => __DIR__ . '/sub'],
   'logTask'

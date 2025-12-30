@@ -1,62 +1,66 @@
-- type:       Script
-  name:       script_task
-  file:       "{fld}/some_script.php"  # {user} will be replaced (see construct)
-  args:     
-    param1:   value1
-    param2:   value2
-  # startDate: "2025-01-04 18:20:00"
-  interval:   5sec
+group_1:
 
-- type:       URL
-  name:       quick_sync
-  url:        http://example.com/quick-sync
-  args:       
-    action:   sync
-    mode:     quick
-  interval:   5sec
-  likeliness: 50                       # 50% chance of running when due
+  - type:       Script
+    name:       script_task
+    file:       "{fld}/some_script.php"  # {user} will be replaced (see construct)
+    args:     
+      param1:   value1
+      param2:   value2
+    # startDate: "2025-01-04 18:20:00"
+    interval:   5sec
 
-- type:       Command                  # Task that waits for completion
-  name:       list_directory
-  command:    dir
-  args:
-    format:   "/B"
-  interval:   5sec
-  likeliness: 100
+  - type:       URL
+    name:       quick_sync
+    url:        http://example.com/quick-sync
+    args:       
+      action:   sync
+      mode:     quick
+    interval:   5sec
+    likeliness: 50                       # 50% chance of running when due
 
-- type:       Process                  # Task that runs independently
-  name:       start_explorer
-  command:    explorer.exe
-  startDate:  "2025-01-30 02:15:00"
-  interval:   10sec
+  - type:       Command                  # Task that waits for completion
+    name:       list_directory
+    command:    dir
+    args:
+      format:   "/B"
+    interval:   5sec
+    likeliness: 100
 
-# Backup samples
+group_2:
 
-- type:      Process
-  name:      backup_tar                      # overrides existing files
-  command:   tar                             # sample: tar -czf debug/out.tar.gz debug/sub
-  args:                                      #         tar -xf  debug/out.tar.gz
-                                              # performance
-    # speed:  "--use-compress-program=pigz"  # - multi thread, must be installed, console: `where pigz`
-    # speed2: "--blocking-factor=64"         # - increases read/write buffer size, but file looks larger (default is 20, try 64 or 128)
-    speed3:   "--preserve-permissions"
-    speed4:   "--same-owner"
-                                              # archive
-    flags:    "-czf"
-    dest:     "out.tar.gz"
-    src:      "sub"                    
+  - type:       Process                  # Task that runs independently
+    name:       start_explorer
+    command:    explorer.exe
+    startDate:  "2025-01-30 02:15:00"
+    interval:   10sec
 
-  interval:   5sec
+  # Backup samples
 
-# unused
+  - type:      Process
+    name:      backup_tar                      # overrides existing files
+    command:   tar                             # sample: tar -czf debug/out.tar.gz debug/sub
+    args:                                      #         tar -xf  debug/out.tar.gz
+                                                # performance
+      # speed:  "--use-compress-program=pigz"  # - multi thread, must be installed, console: `where pigz`
+      # speed2: "--blocking-factor=64"         # - increases read/write buffer size, but file looks larger (default is 20, try 64 or 128)
+      speed3:   "--preserve-permissions"
+      speed4:   "--same-owner"
+                                                # archive
+      flags:    "-czf"
+      dest:     "out.tar.gz"
+      src:      "sub"                    
 
-# - type:       Process
-#   name:       backup
-#   command:    powershell.exe
-#   args:
-#     params:   "-NoProfile -NonInteractive -Command"
-#     cmd:      "Compress-Archive"     # sample: Compress-Archive -Path "C:\SourceFolder\*" -DestinationPath "C:\Backups\MyBackup.zip" -CompressionLevel Fastest -Force
-#     path:     "-Path 'sub\\*'"
-#     dest:     "-DestinationPath 'out.zip'"
-#     misc:     "-CompressionLevel Fastest -Force"   # force replaces file
-#   interval:   10sec
+    interval:   5sec
+
+  # unused
+
+  # - type:       Process
+  #   name:       backup
+  #   command:    powershell.exe
+  #   args:
+  #     params:   "-NoProfile -NonInteractive -Command"
+  #     cmd:      "Compress-Archive"     # sample: Compress-Archive -Path "C:\SourceFolder\*" -DestinationPath "C:\Backups\MyBackup.zip" -CompressionLevel Fastest -Force
+  #     path:     "-Path 'sub\\*'"
+  #     dest:     "-DestinationPath 'out.zip'"
+  #     misc:     "-CompressionLevel Fastest -Force"   # force replaces file
+  #   interval:   10sec
