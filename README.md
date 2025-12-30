@@ -103,6 +103,7 @@ see [sample](debug/config.yml)
   - you may edit this at any time (when a task already has been run)
 - `interval`:   Time interval between runs: 5min, 10min, 30min, hourly, daily, weekly, monthly (5sec, 10sec used for debugging)
 - `likeliness`: (Optional) Percentage chance (1-100) of running when due
+- `comment`:    (Optional)
 
 
 ## Callback fields
@@ -126,37 +127,19 @@ function myCallback( string $state, array $result, float $time, array $config )
     - error (exception message)
     - command (full command)
   - Run URL success
-    - response
-    - http_code
+    - response (response body)
+    - http_code (HTTP status code (200-399))
   - Run URL error
-    - error (message)
-    - response
-    - http_code
+    - error (curl error or HTTP error message)
+    - response (response body if available)
+    - http_code (HTTP status code (400+))
   - Script success
-    - output (echo)
-    - return (returned from script)
+    - output (captured output (echo, print etc.))
+    - return (value of $return variable if set in script)
   - Script error
     - error (exception message)
 - `time`:   execution time in seconds
 - `config`: task configuration (see above)
-
-**URL tasks**
-
-- state = success
-  - `$result['response']`:  response body
-  - `$result['http_code']`: HTTP status code (200-399)
-- state = error
-  - `$result['error']`:     curl error or HTTP error message
-  - `$result['response']`:  response body if available
-  - `$result['http_code']`: HTTP status code (400+)
-
-**Script tasks**
-
-- state = success
-  - `$result['output']`: captured output (echo, print etc.)
-  - `$result['return']`: value of $return variable if set in script
-- state = error
-  - `$result['error']`:  exception message or PHP error
 
 
 LICENSE
