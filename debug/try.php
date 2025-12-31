@@ -3,7 +3,7 @@
 use Symfony\Component\Yaml\Yaml;
 
 require_once 'vendor/autoload.php';
-require_once '../Scheduler.php';
+require_once '../lib/Scheduler.php';
 
 $conf   = Yaml::parseFile('config.yml');
 $config = [];

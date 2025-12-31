@@ -1,4 +1,5 @@
 const App = {
+
   currentTaskIndex: null,
   tasks: [],
   draggedElement: null,
