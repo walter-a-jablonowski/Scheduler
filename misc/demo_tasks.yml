@@ -1,35 +1,16 @@
 group_1:
-
-  - type: Command
+  -
+    type: Command
     name: backup_database
     command: 'mysqldump -u root mydb > backup.sql'
     workingDir: 'C:\backups'
     interval: daily
     likeliness: 100
     comment: 'Daily database backup'
-    devInfo: |
-      Some large info ...
-
-  - type: Process
-    name: monitor_service
-    command: 'start /min "" "python monitor.py"'
-    workingDir: 'C:\monitoring'
-    interval: hourly
-    comment: 'Background monitoring service'
-
-  - type: URL
-    name: health_check
-    url: 'https://api.example.com/health'
-    args:
-      token: abc123
-      verbose: true
-    interval: 5min
-    likeliness: 100
-    comment: 'API health check endpoint'
-
+    devInfo: "Some large info ...\n"
 group_2:
-
-  - type: Script
+  -
+    type: Script
     name: cleanup_logs
     file: cleanup.php
     workingDir: 'C:\scripts'
@@ -39,16 +20,16 @@ group_2:
     interval: weekly
     startDate: '2025-01-01 00:00:00'
     comment: 'Weekly log cleanup script'
-
-  - type: Command
+  -
+    type: Command
     name: git_pull
     command: 'git pull origin main'
     workingDir: 'C:\projects\myapp'
     interval: 30min
     likeliness: 50
     comment: 'Periodic git sync (50% chance)'
-
-  - type: URL
+  -
+    type: URL
     name: webhook_trigger
     url: 'https://hooks.example.com/trigger'
     interval: 10min

@@ -6,6 +6,8 @@ All in one scheduler
 - configure multiple tasks in yml (syncable on multiple devices)
 - also supports advanced features like running a task based on likeliness
 
+![alt text](misc/img.gif)
+
 
 ## Usage
 
@@ -15,60 +17,29 @@ Config see below
 > composer require symfony/yaml
 ```
 
-Usage sample: On Win run via autostart (make a batch file)
 
-```php
-use Symfony\Component\Yaml\Yaml;
+## UI
 
-set_time_limit(0);
+index.php: Management UI for tasks
 
-require_once 'vendor/autoload.php';
-require_once 'lib/Scheduler/Scheduler.php';
-
-// Init your error handler
-
-$config    = Yaml::parseFile('config.yml');
-$scheduler = new Scheduler( $config['scheduler'], 'cache.json', [
-  'some' => 'placeholder',   // placeholders for config fields command, url, file, workingDir like "{some}/file.php"
-  'some' => 'placeholder2',
-  // ...
-], function( string $state, array $result, float $time, array $config ) {
-  // runs when a task is finished with state = success|error (see below)
-  // fallback err handling (ideally called tool does this)
-});
-
-// Delay, wait until apps are ready on system startup
-
-echo "Scheduler starting...\n";
-sleep( 2 * 60 );
-
-// Run Scheduler each 5 min
-
-echo "Scheduler running... Press 'q' and Enter to stop gracefully\n";
-
-while( ! connection_aborted())
-{
-  $scheduler->run();  // exception handled by error handler (or use try catch)
-  
-  // Check for quit command while sleeping
-
-  $start = time(); 
-  while( time() - $start < 5 * 60 )
-  {
-    if(( $input = fgets(STDIN)) !== false && trim($input) === 'q')
-      break;
-
-    sleep(1);
-  }
-}
-
-echo "Scheduler stopped\n";
-```
+![alt text](misc/img.png)
 
 
-## Samples
+## Run
 
-UI: index.php
+See also: _install/startup
+
+- see [sample.php](misc/sample.php)
+- Win autostart: scheduler.bat
+  ```
+  @echo off
+  cd /d "C:\My\Fld"
+
+  php run.php
+  ```
+
+
+## Debug
 
 Class
 
@@ -76,8 +47,6 @@ Class
 > cd debug
 > composer install
 ```
-
-![alt text](misc/img.gif)
 
 
 ## Config
@@ -150,7 +119,7 @@ function myCallback( string $state, array $result, float $time, array $config )
 LICENSE
 ----------------------------------------------------------
 
-Copyright (C) Walter A. Jablonowski 2024, free under MIT [License](LICENSE)
+Copyright (C) Walter A. Jablonowski 2024-2025, free under MIT [License](LICENSE)
 
 This app is build upon PHP and free software (see [credits](credits.md))
 
