@@ -50,7 +50,7 @@ $tasksGrouped = $taskManager->loadTasksGrouped();
                   <div class="task-name"><?= htmlspecialchars($task['name'] ?? '') ?></div>
                   <div class="task-meta">
                     <span class="task-type"><?= htmlspecialchars($task['type'] ?? '') ?></span>
-                    <span class="task-interval"><?= htmlspecialchars($task['interval'] ?? '') ?></span>
+                    <span class="task-interval"><?= htmlspecialchars($task['interval'] ?? '') ?><?php if( isset($task['likeliness']) && $task['likeliness'] != 100 ): ?> <?= htmlspecialchars($task['likeliness']) ?>%<?php endif; ?></span>
                     <span class="task-comment"><?= htmlspecialchars($task['comment'] ?? '') ?></span>
                   </div>
                 </div>
@@ -83,7 +83,7 @@ $tasksGrouped = $taskManager->loadTasksGrouped();
                   <div class="task-name"><?= htmlspecialchars($task['name'] ?? '') ?></div>
                   <div class="task-meta-mobile">
                     <span class="task-type"><?= htmlspecialchars($task['type'] ?? '') ?></span>
-                    <span class="task-interval"><?= htmlspecialchars($task['interval'] ?? '') ?></span>
+                    <span class="task-interval"><?= htmlspecialchars($task['interval'] ?? '') ?><?php if( isset($task['likeliness']) && $task['likeliness'] != 100 ): ?> <?= htmlspecialchars($task['likeliness']) ?>%<?php endif; ?></span>
                   </div>
                   <?php if( ! empty($task['comment']) ): ?>
                     <div class="task-comment"><?= htmlspecialchars($task['comment']) ?></div>
@@ -112,7 +112,6 @@ $tasksGrouped = $taskManager->loadTasksGrouped();
 
   <div id="modalOverlay" class="modal-overlay">
     <div class="modal-content">
-      <button class="modal-close">×</button>
       <div id="modalEditor" class="task-editor"></div>
     </div>
   </div>

@@ -461,7 +461,9 @@ const App = {
 
   renderEditor(task)
   {
+    const isMobile = window.innerWidth <= 768;
     return `
+      <div class="task-editor">
       <div id="taskEditor" class="task-form">
         <div class="editor-tabs">
           <button class="editor-tab active" data-tab="edit">Edit</button>
@@ -529,15 +531,25 @@ const App = {
             <textarea name="devInfo" placeholder="Enter development notes, technical details, etc.">${this.escapeHtml(task.devInfo || '')}</textarea>
           </div>
         </div>
+        
+        ${isMobile ? `
+        <div class="form-actions mobile-actions">
+          <button class="btn-save" id="btnSaveTask">Save</button>
+          <button class="btn-cancel" id="btnCancelTask">Cancel</button>
+        </div>
+        ` : ''}
+      </div>
       </div>
     `;
   },
 
   showEditor(html)
   {
-    const editor = document.getElementById('taskEditor');
-    editor.innerHTML = html;
-    this.attachFormListeners();
+    const editorPanel = document.querySelector('.task-editor-panel .task-editor');
+    if( editorPanel ) {
+      editorPanel.innerHTML = html;
+      this.attachFormListeners();
+    }
   },
 
   showModal(html)
@@ -560,6 +572,7 @@ const App = {
   {
     const editorDiv = document.querySelector('.task-form');
     const typeSelect = document.getElementById('taskType');
+    const isMobile = window.innerWidth <= 768;
 
     if( typeSelect ) {
       typeSelect.addEventListener('change', (e) => {
@@ -577,16 +590,33 @@ const App = {
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         
         e.target.classList.add('active');
-        document.querySelector(`[data-tab-content="${targetTab}"]`).classList.add('active');
+        const targetContent = document.querySelector(`[data-tab-content="${targetTab}"]`);
+        if( targetContent )
+          targetContent.classList.add('active');
         
         if( targetTab === 'devinfo' )
           this.adjustDevInfoHeight();
       });
     });
     
-    this.adjustDevInfoHeight();
+    setTimeout(() => this.adjustDevInfoHeight(), 50);
+    
+    const btnSave = document.getElementById('btnSaveTask');
+    const btnCancel = document.getElementById('btnCancelTask');
+    
+    if( btnSave ) {
+      btnSave.addEventListener('click', () => {
+        this.saveTask(false);
+      });
+    }
+    
+    if( btnCancel ) {
+      btnCancel.addEventListener('click', () => {
+        this.closeModal();
+      });
+    }
 
-    if( editorDiv ) {
+    if( editorDiv && ! isMobile ) {
       editorDiv.querySelectorAll('input, select, textarea').forEach(field => {
         field.addEventListener('change', () => {
           this.clearValidationErrors();
@@ -732,13 +762,17 @@ const App = {
     .then(data => {
       if( data.success ) {
         this.clearValidationErrors();
-        if( action === 'create' && ! silent ) {
-          this.addTaskToList(taskData);
-          if( window.innerWidth <= 768 )
-            this.closeModal();
+        if( action === 'create' ) {
+          if( ! silent ) {
+            this.addTaskToList(taskData);
+            if( window.innerWidth <= 768 )
+              this.closeModal();
+          }
         }
-        else if( action === 'update' && ! silent ) {
+        else if( action === 'update' ) {
           this.updateTaskInList(this.currentTaskIndex, taskData);
+          if( ! silent && window.innerWidth <= 768 )
+            this.closeModal();
         }
       }
       else {
@@ -767,6 +801,9 @@ const App = {
     
     const newIndex = document.querySelectorAll('.task-item').length;
     
+    const intervalText = taskData.interval || '';
+    const likelinessText = (taskData.likeliness && taskData.likeliness != 100) ? ` ${taskData.likeliness}%` : '';
+    
     const taskHtml = `
       <div class="task-item" data-index="${newIndex}">
         <div class="drag-handle">⠸⠸</div>
@@ -774,7 +811,7 @@ const App = {
           <div class="task-name">${this.escapeHtml(taskData.name || '')}</div>
           <div class="task-meta">
             <span class="task-type">${this.escapeHtml(taskData.type || '')}</span>
-            <span class="task-interval">${this.escapeHtml(taskData.interval || '')}</span>
+            <span class="task-interval">${this.escapeHtml(intervalText)}${likelinessText}</span>
             <span class="task-comment">${this.escapeHtml(taskData.comment || '')}</span>
           </div>
         </div>
@@ -789,7 +826,7 @@ const App = {
           <div class="task-name">${this.escapeHtml(taskData.name || '')}</div>
           <div class="task-meta-mobile">
             <span class="task-type">${this.escapeHtml(taskData.type || '')}</span>
-            <span class="task-interval">${this.escapeHtml(taskData.interval || '')}</span>
+            <span class="task-interval">${this.escapeHtml(intervalText)}${likelinessText}</span>
           </div>
           ${taskData.comment ? `<div class="task-comment">${this.escapeHtml(taskData.comment)}</div>` : ''}
         </div>
@@ -808,23 +845,42 @@ const App = {
 
   updateTaskInList(index, taskData)
   {
+    const intervalText = taskData.interval || '';
+    const likelinessText = (taskData.likeliness && taskData.likeliness != 100) ? ` ${taskData.likeliness}%` : '';
+    
     const item = document.querySelector(`.task-item[data-index="${index}"]`);
-    if( ! item )
-      return;
+    if( item ) {
+      const nameEl = item.querySelector('.task-name');
+      const typeEl = item.querySelector('.task-type');
+      const intervalEl = item.querySelector('.task-interval');
+      const commentEl = item.querySelector('.task-comment');
+      
+      if( nameEl )
+        nameEl.textContent = taskData.name || '';
+      if( typeEl )
+        typeEl.textContent = taskData.type || '';
+      if( intervalEl )
+        intervalEl.textContent = intervalText + likelinessText;
+      if( commentEl )
+        commentEl.textContent = taskData.comment || '';
+    }
     
-    const nameEl = item.querySelector('.task-name');
-    const typeEl = item.querySelector('.task-type');
-    const intervalEl = item.querySelector('.task-interval');
-    const commentEl = item.querySelector('.task-comment');
-    
-    if( nameEl )
-      nameEl.textContent = taskData.name || '';
-    if( typeEl )
-      typeEl.textContent = taskData.type || '';
-    if( intervalEl )
-      intervalEl.textContent = taskData.interval || '';
-    if( commentEl )
-      commentEl.textContent = taskData.comment || '';
+    const itemMobile = document.querySelector(`.task-item-mobile[data-index="${index}"]`);
+    if( itemMobile ) {
+      const nameEl = itemMobile.querySelector('.task-name');
+      const typeEl = itemMobile.querySelector('.task-type');
+      const intervalEl = itemMobile.querySelector('.task-interval');
+      const commentEl = itemMobile.querySelector('.task-comment');
+      
+      if( nameEl )
+        nameEl.textContent = taskData.name || '';
+      if( typeEl )
+        typeEl.textContent = taskData.type || '';
+      if( intervalEl )
+        intervalEl.textContent = intervalText + likelinessText;
+      if( commentEl )
+        commentEl.textContent = taskData.comment || '';
+    }
   },
 
   showValidationErrors(errors)
@@ -931,14 +987,39 @@ const App = {
     fetch('ajax.php?action=getLog')
       .then(response => response.json())
       .then(data => {
-        if( data.success )
-          logContent.textContent = data.content || 'Log file is empty';
+        if( data.success ) {
+          const content = data.content || 'Log file is empty';
+          logContent.innerHTML = this.highlightLog(content);
+        }
         else
           logContent.textContent = 'Error: ' + (data.error || 'Failed to load log file');
       })
       .catch(err => {
         logContent.textContent = 'Error: ' + err.message;
       });
+  },
+  
+  highlightLog(text)
+  {
+    const lines = text.split('\n');
+    return lines.map(line => {
+      let highlightedLine = this.escapeHtml(line);
+      
+      if( /error|exception|fatal|failed|failure/i.test(line) )
+        return `<span class="log-error">${highlightedLine}</span>`;
+      else if( /warning|warn/i.test(line) )
+        return `<span class="log-warning">${highlightedLine}</span>`;
+      else if( /success|completed|done|ok/i.test(line) )
+        return `<span class="log-success">${highlightedLine}</span>`;
+      else if( /info|notice/i.test(line) )
+        return `<span class="log-info">${highlightedLine}</span>`;
+      else if( /\d{4}-\d{2}-\d{2}|\d{2}:\d{2}:\d{2}/.test(line) )
+        highlightedLine = highlightedLine.replace(/(\d{4}-\d{2}-\d{2}[\sT]\d{2}:\d{2}:\d{2})/g, '<span class="log-timestamp">$1</span>');
+      
+      highlightedLine = highlightedLine.replace(/([A-Z]:\\[^\s]+|\/[^\s]+)/g, '<span class="log-path">$1</span>');
+      
+      return highlightedLine;
+    }).join('\n');
   },
   
   closeLogModal()

@@ -400,7 +400,7 @@ body {
 
 .tab-content[data-tab-content="edit"] {
   overflow-y: auto;
-  padding-right: 0.5rem;
+  padding-right: 1rem;
 }
 
 .tab-content[data-tab-content="devinfo"] {
@@ -538,8 +538,34 @@ body {
   font-family: 'Courier New', monospace;
   font-size: 0.85rem;
   line-height: 1.5;
-  white-space: pre-wrap;
-  word-wrap: break-word;
+  white-space: pre;
+  word-wrap: normal;
+  overflow-x: auto;
+}
+
+.log-content .log-error {
+  color: #f48771;
+  font-weight: 500;
+}
+
+.log-content .log-warning {
+  color: #dcdcaa;
+}
+
+.log-content .log-success {
+  color: #4ec9b0;
+}
+
+.log-content .log-info {
+  color: #9cdcfe;
+}
+
+.log-content .log-timestamp {
+  color: #858585;
+}
+
+.log-content .log-path {
+  color: #ce9178;
 }
 
 .log-modal .modal-close {
@@ -580,6 +606,15 @@ body {
 
 .btn-confirm:hover {
   background: #d70015;
+}
+
+.mobile-actions {
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  padding: 1rem 0 0 0;
+  margin-top: 1rem;
+  border-top: 1px solid #e5e5e7;
 }
 
 @media (max-width: 768px) {
@@ -697,12 +732,16 @@ body {
 
   .task-item-mobile .btn-delete {
     position: absolute;
-    right: 0.5rem;
+    right: 1rem;
     top: 50%;
     transform: translateY(-50%);
     width: 28px;
     height: 28px;
     font-size: 1.3rem;
+  }
+  
+  .group-header-wrapper-mobile .btn-delete-group {
+    margin-right: 0.25rem;
   }
 
   .modal-content {
@@ -721,11 +760,23 @@ body {
   }
   
   .modal-content .task-editor {
-    padding: 0.5rem;
+    padding: 0.25rem;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .modal-content .task-form {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   .form-group textarea[name="devInfo"] {
     flex: 1;
+    min-height: 200px;
   }
   
   .modal-content {
@@ -733,9 +784,9 @@ body {
     flex-direction: column;
   }
   
-  .modal-content .task-editor {
-    flex: 1;
-    overflow: hidden;
+  .mobile-actions {
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
   }
 
   .form-group {
