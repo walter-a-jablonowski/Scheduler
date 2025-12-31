@@ -280,6 +280,10 @@ body {
   margin-bottom: 1.5rem;
 }
 
+.form-group.no-padding {
+  margin-bottom: .5rem;
+}
+
 .form-group label {
   display: block;
   font-weight: 500;

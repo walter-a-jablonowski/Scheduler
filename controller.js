@@ -411,8 +411,7 @@ const App = {
         </div>
         
         <div class="tab-content active" data-tab-content="edit">
-          <div class="form-group">
-            <label>Type *</label>
+          <div class="form-group no-padding">
             <select name="type" id="taskType" required>
               <option value="Command" ${task.type === 'Command' ? 'selected' : ''}>Command</option>
               <option value="Process" ${task.type === 'Process' ? 'selected' : ''}>Process</option>
@@ -422,32 +421,28 @@ const App = {
           </div>
 
           <div class="form-group">
-            <label>Name *</label>
-            <input type="text" name="name" value="${this.escapeHtml(task.name || '')}" required>
+            <input type="text" name="name" placeholder="Name *" value="${this.escapeHtml(task.name || '')}" required>
           </div>
 
-          <div class="form-group" id="commandFieldGroup">
-            <label id="commandFieldLabel">Command *</label>
+          <div class="form-group no-padding" id="commandFieldGroup">
+            <label id="commandFieldLabel">Command * - Dir - Args</label>
             <input type="text" id="commandField" name="command" value="${this.escapeHtml(task.command || task.url || task.file || '')}">
           </div>
 
-          <div class="form-group conditional-field" data-types="Command,Process,Script">
-            <label>Working Directory</label>
-            <input type="text" name="workingDir" value="${this.escapeHtml(task.workingDir || '')}">
+          <div class="form-group no-padding conditional-field" data-types="Command,Process,Script">
+            <input type="text" name="workingDir" placeholder="Working Dir" title="Working dir" value="${this.escapeHtml(task.workingDir || '')}">
           </div>
 
           <div class="form-group">
-            <label>Arguments / Query Parameters</label>
-            <textarea name="args" rows="3" placeholder="JSON object, array, or line-separated values">${this.escapeHtml(task.args || '')}</textarea>
+            <textarea name="args" rows="3" placeholder="Args: JSON, array, or line-sep values" title="Args: JSON, array, or line-sep values">${this.escapeHtml(task.args || '')}</textarea>
           </div>
 
-          <div class="form-group">
-            <label>Start Date</label>
+          <div class="form-group no-padding">
+            <label>Start Date - Interval * - Likeliness (%)</label>
             <input type="text" name="startDate" value="${this.escapeHtml(task.startDate || '')}" placeholder="YYYY-MM-DD HH:MM:SS">
           </div>
 
-          <div class="form-group">
-            <label>Interval *</label>
+          <div class="form-group no-padding">
             <select name="interval" required>
               <option value="5sec" ${task.interval === '5sec' ? 'selected' : ''}>5 seconds (debug)</option>
               <option value="10sec" ${task.interval === '10sec' ? 'selected' : ''}>10 seconds (debug)</option>
@@ -462,7 +457,6 @@ const App = {
           </div>
 
           <div class="form-group">
-            <label>Likeliness (%)</label>
             <input type="number" name="likeliness" value="${task.likeliness || 100}" min="1" max="100">
           </div>
 
@@ -563,7 +557,7 @@ const App = {
     const currentValue = input.value;
     
     if( type === 'Command' || type === 'Process' ) {
-      label.textContent = 'Command *';
+      label.textContent = 'Command * - Dir - Args';
       input.setAttribute('name', 'command');
       input.setAttribute('type', 'text');
       input.required = true;
@@ -571,7 +565,7 @@ const App = {
         workingDirGroup.style.display = 'block';
     }
     else if( type === 'URL' ) {
-      label.textContent = 'URL *';
+      label.textContent = 'URL * - Args';
       input.setAttribute('name', 'url');
       input.setAttribute('type', 'url');
       input.required = true;
@@ -579,7 +573,7 @@ const App = {
         workingDirGroup.style.display = 'none';
     }
     else if( type === 'Script' ) {
-      label.textContent = 'Script File *';
+      label.textContent = 'Script File * - Args';
       input.setAttribute('name', 'file');
       input.setAttribute('type', 'text');
       input.required = true;
