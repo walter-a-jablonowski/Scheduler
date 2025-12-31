@@ -10,14 +10,14 @@ $tasksGrouped = $taskManager->loadTasksGrouped();
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Scheduler Task Manager</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=<?= filemtime('style.css') ?>">
 </head>
 <body>
   
   <header class="header">
     <h3>Scheduler Tasks</h3>
     <div class="dropdown-wrapper">
-      <button id="btnNew" class="btn-new">New</button>
+      <button id="btnNew" class="btn-new">New <span class="arrow-down">▼</span></button>
       <div id="dropdownMenu" class="dropdown-menu">
         <button class="dropdown-item" data-action="new-task">New Task</button>
         <button class="dropdown-item" data-action="new-group">New Group</button>
@@ -33,7 +33,7 @@ $tasksGrouped = $taskManager->loadTasksGrouped();
           <?php 
           $globalIndex = 0;
           foreach( $tasksGrouped as $groupName => $tasks ):
-            if( ! is_array($tasks) || empty($tasks) )
+            if( ! is_array($tasks) )
               continue;
           ?>
             <div class="group-header-wrapper">
@@ -79,6 +79,6 @@ $tasksGrouped = $taskManager->loadTasksGrouped();
     </div>
   </div>
 
-  <script src="controller.js"></script>
+  <script src="controller.js?v=<?= filemtime('controller.js') ?>"></script>
 </body>
 </html>

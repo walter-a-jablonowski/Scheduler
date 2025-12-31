@@ -524,8 +524,13 @@ const App = {
         
         e.target.classList.add('active');
         document.querySelector(`[data-tab-content="${targetTab}"]`).classList.add('active');
+        
+        if( targetTab === 'devinfo' )
+          this.adjustDevInfoHeight();
       });
     });
+    
+    this.adjustDevInfoHeight();
 
     if( editorDiv ) {
       editorDiv.querySelectorAll('input, select, textarea').forEach(field => {
@@ -534,7 +539,7 @@ const App = {
           if( this.currentTaskIndex !== null )
             this.autoSave();
           else
-            this.saveTask(true);
+            this.saveTask(false);
         });
         
         field.addEventListener('input', () => {
@@ -673,12 +678,12 @@ const App = {
     .then(data => {
       if( data.success ) {
         this.clearValidationErrors();
-        if( action === 'create' ) {
+        if( action === 'create' && ! silent ) {
           this.addTaskToList(taskData);
           if( window.innerWidth <= 768 )
             this.closeModal();
         }
-        else if( ! silent ) {
+        else if( action === 'update' && ! silent ) {
           this.updateTaskInList(this.currentTaskIndex, taskData);
         }
       }
@@ -703,7 +708,7 @@ const App = {
     const newIndex = document.querySelectorAll('.task-item').length;
     const taskHtml = `
       <div class="task-item" data-index="${newIndex}">
-        <div class="drag-handle">⋮⋮</div>
+        <div class="drag-handle">⠸⠸</div>
         <div class="task-info">
           <div class="task-name">${this.escapeHtml(taskData.name || '')}</div>
           <div class="task-meta">
@@ -834,7 +839,41 @@ const App = {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  },
+  
+  adjustDevInfoHeight()
+  {
+    const devInfoTab = document.querySelector('[data-tab-content="devinfo"]');
+    if( ! devInfoTab )
+      return;
+    
+    const textarea = devInfoTab.querySelector('textarea[name="devInfo"]');
+    if( ! textarea )
+      return;
+    
+    const formGroup = textarea.closest('.form-group');
+    if( ! formGroup )
+      return;
+    
+    setTimeout(() => {
+      const tabContent = textarea.closest('.tab-content');
+      if( ! tabContent )
+        return;
+      
+      const availableHeight = tabContent.clientHeight;
+      const label = formGroup.querySelector('label');
+      const labelHeight = label ? label.offsetHeight : 0;
+      const marginBottom = parseFloat(getComputedStyle(formGroup).marginBottom) || 0;
+      
+      const textareaHeight = availableHeight - labelHeight - marginBottom - 10;
+      textarea.style.height = `${textareaHeight}px`;
+    }, 10);
   }
 };
 
 document.addEventListener('DOMContentLoaded', () => App.init());
+
+window.addEventListener('resize', () => {
+  if( App.adjustDevInfoHeight )
+    App.adjustDevInfoHeight();
+});
