@@ -15,8 +15,14 @@ $tasksGrouped = $taskManager->loadTasksGrouped();
 <body>
   
   <header class="header">
-    <h1>Scheduler Tasks</h1>
-    <button id="btnNew" class="btn-new">+ New Task</button>
+    <h3>Scheduler Tasks</h3>
+    <div class="dropdown-wrapper">
+      <button id="btnNew" class="btn-new">New</button>
+      <div id="dropdownMenu" class="dropdown-menu">
+        <button class="dropdown-item" data-action="new-task">New Task</button>
+        <button class="dropdown-item" data-action="new-group">New Group</button>
+      </div>
+    </div>
   </header>
 
   <div class="container">
@@ -30,7 +36,10 @@ $tasksGrouped = $taskManager->loadTasksGrouped();
             if( ! is_array($tasks) || empty($tasks) )
               continue;
           ?>
-            <div class="group-header"><?= htmlspecialchars($groupName) ?></div>
+            <div class="group-header-wrapper">
+              <div class="group-header-text"><?= htmlspecialchars($groupName) ?></div>
+              <button class="btn-delete-group" data-group="<?= htmlspecialchars($groupName) ?>" title="Delete group">×</button>
+            </div>
             <?php foreach( $tasks as $task ): ?>
               <div class="task-item" data-index="<?= $globalIndex ?>">
                 <div class="drag-handle">⋮⋮</div>

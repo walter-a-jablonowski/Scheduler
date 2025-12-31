@@ -7,6 +7,8 @@ group_1:
     interval: daily
     likeliness: 100
     comment: 'Daily database backup'
+    devInfo: |
+      Some large info ...
 
   - type: Process
     name: monitor_service

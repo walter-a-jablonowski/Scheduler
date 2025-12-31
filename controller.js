@@ -13,9 +13,33 @@ const App = {
 
   attachEventListeners()
   {
-    document.getElementById('btnNew').addEventListener('click', () => this.createNewTask());
+    const btnNew = document.getElementById('btnNew');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    
+    btnNew.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdownMenu.classList.toggle('active');
+    });
+    
+    document.addEventListener('click', (e) => {
+      if( ! e.target.closest('.dropdown-wrapper') )
+        dropdownMenu.classList.remove('active');
+    });
+    
+    document.querySelectorAll('.dropdown-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        const action = e.target.dataset.action;
+        dropdownMenu.classList.remove('active');
+        
+        if( action === 'new-task' )
+          this.createNewTask();
+        else if( action === 'new-group' )
+          this.createNewGroup();
+      });
+    });
     
     this.attachTaskItemListeners();
+    this.attachGroupDeleteListeners();
 
     document.querySelector('.modal-close')?.addEventListener('click', () => this.closeModal());
     document.getElementById('modalOverlay')?.addEventListener('click', (e) => {
@@ -44,6 +68,22 @@ const App = {
           this.deleteTask(parseInt(deleteBtn.dataset.index));
         });
       }
+    });
+  },
+  
+  attachGroupDeleteListeners()
+  {
+    document.querySelectorAll('.btn-delete-group').forEach(btn => {
+      if( btn.dataset.listenerAttached )
+        return;
+      
+      btn.dataset.listenerAttached = 'true';
+      
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const groupName = btn.dataset.group;
+        this.deleteGroup(groupName);
+      });
     });
   },
 
@@ -197,13 +237,108 @@ const App = {
       startDate: '',
       interval: '5min',
       likeliness: 100,
-      comment: ''
+      comment: '',
+      devInfo: ''
     });
 
     if( window.innerWidth <= 768 )
       this.showModal(editorHtml);
     else
       this.showEditor(editorHtml);
+  },
+  
+  createNewGroup()
+  {
+    const promptHtml = `
+      <div class="group-name-prompt">
+        <h3>Create New Group</h3>
+        <input type="text" id="groupNameInput" placeholder="Enter group name" />
+        <div class="form-actions">
+          <button class="btn-confirm" id="btnConfirmGroup">Create</button>
+          <button class="btn-cancel" id="btnCancelGroup">Cancel</button>
+        </div>
+      </div>
+    `;
+    
+    if( window.innerWidth <= 768 )
+      this.showModal(promptHtml);
+    else
+      this.showEditor(promptHtml);
+    
+    setTimeout(() => {
+      const input = document.getElementById('groupNameInput');
+      const btnConfirm = document.getElementById('btnConfirmGroup');
+      const btnCancel = document.getElementById('btnCancelGroup');
+      
+      if( input ) {
+        input.focus();
+        input.addEventListener('keypress', (e) => {
+          if( e.key === 'Enter' )
+            this.saveNewGroup();
+        });
+      }
+      
+      if( btnConfirm )
+        btnConfirm.addEventListener('click', () => this.saveNewGroup());
+      
+      if( btnCancel ) {
+        btnCancel.addEventListener('click', () => {
+          if( window.innerWidth <= 768 )
+            this.closeModal();
+          else
+            document.getElementById('taskEditor').innerHTML = '<div class="editor-placeholder">Select a task to edit or create a new one</div>';
+        });
+      }
+    }, 10);
+  },
+  
+  saveNewGroup()
+  {
+    const input = document.getElementById('groupNameInput');
+    if( ! input )
+      return;
+    
+    const groupName = input.value.trim();
+    if( ! groupName ) {
+      alert('Please enter a group name');
+      return;
+    }
+    
+    fetch('ajax.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'createGroup', groupName: groupName })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if( data.success ) {
+        location.reload();
+      }
+      else
+        alert('Failed to create group: ' + (data.error || 'Unknown error'));
+    })
+    .catch(err => alert('Error: ' + err.message));
+  },
+  
+  deleteGroup(groupName)
+  {
+    if( ! confirm(`Are you sure you want to delete the group "${groupName}" and all its tasks?`) )
+      return;
+    
+    fetch('ajax.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'deleteGroup', groupName: groupName })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if( data.success ) {
+        location.reload();
+      }
+      else
+        this.showSnackbar('Failed to delete group: ' + (data.error || 'Unknown error'), 'error');
+    })
+    .catch(err => this.showSnackbar('Error: ' + err.message, 'error'));
   },
 
   editTask(index)
@@ -270,66 +405,78 @@ const App = {
   {
     return `
       <div id="taskEditor" class="task-form">
-        <div class="form-group">
-          <label>Type *</label>
-          <select name="type" id="taskType" required>
-            <option value="Command" ${task.type === 'Command' ? 'selected' : ''}>Command</option>
-            <option value="Process" ${task.type === 'Process' ? 'selected' : ''}>Process</option>
-            <option value="URL" ${task.type === 'URL' ? 'selected' : ''}>URL</option>
-            <option value="Script" ${task.type === 'Script' ? 'selected' : ''}>Script</option>
-          </select>
+        <div class="editor-tabs">
+          <button class="editor-tab active" data-tab="edit">Edit</button>
+          <button class="editor-tab" data-tab="devinfo">Dev Info</button>
         </div>
+        
+        <div class="tab-content active" data-tab-content="edit">
+          <div class="form-group">
+            <label>Type *</label>
+            <select name="type" id="taskType" required>
+              <option value="Command" ${task.type === 'Command' ? 'selected' : ''}>Command</option>
+              <option value="Process" ${task.type === 'Process' ? 'selected' : ''}>Process</option>
+              <option value="URL" ${task.type === 'URL' ? 'selected' : ''}>URL</option>
+              <option value="Script" ${task.type === 'Script' ? 'selected' : ''}>Script</option>
+            </select>
+          </div>
 
-        <div class="form-group">
-          <label>Name *</label>
-          <input type="text" name="name" value="${this.escapeHtml(task.name || '')}" required>
+          <div class="form-group">
+            <label>Name *</label>
+            <input type="text" name="name" value="${this.escapeHtml(task.name || '')}" required>
+          </div>
+
+          <div class="form-group" id="commandFieldGroup">
+            <label id="commandFieldLabel">Command *</label>
+            <input type="text" id="commandField" name="command" value="${this.escapeHtml(task.command || task.url || task.file || '')}">
+          </div>
+
+          <div class="form-group conditional-field" data-types="Command,Process,Script">
+            <label>Working Directory</label>
+            <input type="text" name="workingDir" value="${this.escapeHtml(task.workingDir || '')}">
+          </div>
+
+          <div class="form-group">
+            <label>Arguments / Query Parameters</label>
+            <textarea name="args" rows="3" placeholder="JSON object, array, or line-separated values">${this.escapeHtml(task.args || '')}</textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Start Date</label>
+            <input type="text" name="startDate" value="${this.escapeHtml(task.startDate || '')}" placeholder="YYYY-MM-DD HH:MM:SS">
+          </div>
+
+          <div class="form-group">
+            <label>Interval *</label>
+            <select name="interval" required>
+              <option value="5sec" ${task.interval === '5sec' ? 'selected' : ''}>5 seconds (debug)</option>
+              <option value="10sec" ${task.interval === '10sec' ? 'selected' : ''}>10 seconds (debug)</option>
+              <option value="5min" ${task.interval === '5min' ? 'selected' : ''}>5 minutes</option>
+              <option value="10min" ${task.interval === '10min' ? 'selected' : ''}>10 minutes</option>
+              <option value="30min" ${task.interval === '30min' ? 'selected' : ''}>30 minutes</option>
+              <option value="hourly" ${task.interval === 'hourly' ? 'selected' : ''}>Hourly</option>
+              <option value="daily" ${task.interval === 'daily' ? 'selected' : ''}>Daily</option>
+              <option value="weekly" ${task.interval === 'weekly' ? 'selected' : ''}>Weekly</option>
+              <option value="monthly" ${task.interval === 'monthly' ? 'selected' : ''}>Monthly</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Likeliness (%)</label>
+            <input type="number" name="likeliness" value="${task.likeliness || 100}" min="1" max="100">
+          </div>
+
+          <div class="form-group">
+            <label>Comment</label>
+            <textarea name="comment" rows="2">${this.escapeHtml(task.comment || '')}</textarea>
+          </div>
         </div>
-
-        <div class="form-group" id="commandFieldGroup">
-          <label id="commandFieldLabel">Command *</label>
-          <input type="text" id="commandField" name="command" value="${this.escapeHtml(task.command || task.url || task.file || '')}">
+        
+        <div class="tab-content" data-tab-content="devinfo">
+          <div class="form-group">
+            <textarea name="devInfo" placeholder="Enter development notes, technical details, etc.">${this.escapeHtml(task.devInfo || '')}</textarea>
+          </div>
         </div>
-
-        <div class="form-group conditional-field" data-types="Command,Process,Script">
-          <label>Working Directory</label>
-          <input type="text" name="workingDir" value="${this.escapeHtml(task.workingDir || '')}">
-        </div>
-
-        <div class="form-group">
-          <label>Arguments / Query Parameters</label>
-          <textarea name="args" rows="3" placeholder="JSON object, array, or line-separated values">${this.escapeHtml(task.args || '')}</textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Start Date</label>
-          <input type="text" name="startDate" value="${this.escapeHtml(task.startDate || '')}" placeholder="YYYY-MM-DD HH:MM:SS">
-        </div>
-
-        <div class="form-group">
-          <label>Interval *</label>
-          <select name="interval" required>
-            <option value="5sec" ${task.interval === '5sec' ? 'selected' : ''}>5 seconds (debug)</option>
-            <option value="10sec" ${task.interval === '10sec' ? 'selected' : ''}>10 seconds (debug)</option>
-            <option value="5min" ${task.interval === '5min' ? 'selected' : ''}>5 minutes</option>
-            <option value="10min" ${task.interval === '10min' ? 'selected' : ''}>10 minutes</option>
-            <option value="30min" ${task.interval === '30min' ? 'selected' : ''}>30 minutes</option>
-            <option value="hourly" ${task.interval === 'hourly' ? 'selected' : ''}>Hourly</option>
-            <option value="daily" ${task.interval === 'daily' ? 'selected' : ''}>Daily</option>
-            <option value="weekly" ${task.interval === 'weekly' ? 'selected' : ''}>Weekly</option>
-            <option value="monthly" ${task.interval === 'monthly' ? 'selected' : ''}>Monthly</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Likeliness (%)</label>
-          <input type="number" name="likeliness" value="${task.likeliness || 100}" min="1" max="100">
-        </div>
-
-        <div class="form-group">
-          <label>Comment</label>
-          <textarea name="comment" rows="2">${this.escapeHtml(task.comment || '')}</textarea>
-        </div>
-
       </div>
     `;
   },
@@ -367,22 +514,36 @@ const App = {
       
       this.updateCommandField(typeSelect.value);
     }
-
-    editorDiv.querySelectorAll('input, select, textarea').forEach(field => {
-      field.addEventListener('change', () => {
-        this.clearValidationErrors();
-        if( this.currentTaskIndex !== null )
-          this.autoSave();
-        else
-          this.saveTask(true);
-      });
-      
-      field.addEventListener('input', () => {
-        this.clearValidationErrors();
-        if( this.currentTaskIndex !== null )
-          this.autoSave();
+    
+    document.querySelectorAll('.editor-tab').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        const targetTab = e.target.dataset.tab;
+        
+        document.querySelectorAll('.editor-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        e.target.classList.add('active');
+        document.querySelector(`[data-tab-content="${targetTab}"]`).classList.add('active');
       });
     });
+
+    if( editorDiv ) {
+      editorDiv.querySelectorAll('input, select, textarea').forEach(field => {
+        field.addEventListener('change', () => {
+          this.clearValidationErrors();
+          if( this.currentTaskIndex !== null )
+            this.autoSave();
+          else
+            this.saveTask(true);
+        });
+        
+        field.addEventListener('input', () => {
+          this.clearValidationErrors();
+          if( this.currentTaskIndex !== null )
+            this.autoSave();
+        });
+      });
+    }
   },
 
   updateCommandField(type)
@@ -489,6 +650,8 @@ const App = {
       delete taskData.workingDir;
     if( ! taskData.comment )
       delete taskData.comment;
+    if( ! taskData.devInfo )
+      delete taskData.devInfo;
 
     taskData.likeliness = parseInt(taskData.likeliness) || 100;
 

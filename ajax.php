@@ -80,6 +80,26 @@ elseif( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
       echo json_encode(['success' => $success]);
       break;
 
+    case 'createGroup':
+      $groupName = $data['groupName'] ?? '';
+      if( empty($groupName) ) {
+        echo json_encode(['success' => false, 'error' => 'Group name is required']);
+        break;
+      }
+      $success = $taskManager->createGroup($groupName);
+      echo json_encode(['success' => $success]);
+      break;
+
+    case 'deleteGroup':
+      $groupName = $data['groupName'] ?? '';
+      if( empty($groupName) ) {
+        echo json_encode(['success' => false, 'error' => 'Group name is required']);
+        break;
+      }
+      $success = $taskManager->deleteGroup($groupName);
+      echo json_encode(['success' => $success]);
+      break;
+
     default:
       echo json_encode(['success' => false, 'error' => 'Invalid action']);
   }

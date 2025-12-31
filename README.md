@@ -108,6 +108,7 @@ see [sample](debug/config.yml)
 - `interval`:   Time interval between runs: 5min, 10min, 30min, hourly, daily, weekly, monthly (5sec, 10sec used for debugging)
 - `likeliness`: (Optional) Percentage chance (1-100) of running when due
 - `comment`:    (Optional)
+- `devInfo`:    (Optional)
 
 
 ## Callback fields

@@ -339,4 +339,54 @@ class TaskManager
 
     return $errors;
   }
+
+  public function createGroup( string $groupName ) : bool
+  {
+    if( ! file_exists($this->dataFile) )
+      return false;
+    
+    $data = Yaml::parseFile($this->dataFile);
+    if( ! is_array($data) )
+      return false;
+    
+    if( ! $this->isGroupedStructure($data) )
+      $data = ['default' => $data];
+    
+    if( isset($data[$groupName]) )
+      return false;
+    
+    $data[$groupName] = [];
+    
+    $dir = dirname($this->dataFile);
+    if( ! is_dir($dir) )
+      mkdir($dir, 0755, true);
+    
+    $yaml = Yaml::dump($data, 4, 2);
+    return file_put_contents($this->dataFile, $yaml) !== false;
+  }
+
+  public function deleteGroup( string $groupName ) : bool
+  {
+    if( ! file_exists($this->dataFile) )
+      return false;
+    
+    $data = Yaml::parseFile($this->dataFile);
+    if( ! is_array($data) )
+      return false;
+    
+    if( ! $this->isGroupedStructure($data) )
+      return false;
+    
+    if( ! isset($data[$groupName]) )
+      return false;
+    
+    unset($data[$groupName]);
+    
+    $dir = dirname($this->dataFile);
+    if( ! is_dir($dir) )
+      mkdir($dir, 0755, true);
+    
+    $yaml = Yaml::dump($data, 4, 2);
+    return file_put_contents($this->dataFile, $yaml) !== false;
+  }
 }
