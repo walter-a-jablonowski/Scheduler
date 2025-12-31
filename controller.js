@@ -14,12 +14,17 @@ const App = {
   attachEventListeners()
   {
     const btnNew = document.getElementById('btnNew');
+    const btnLog = document.getElementById('btnLog');
     const dropdownMenu = document.getElementById('dropdownMenu');
     
     btnNew.addEventListener('click', (e) => {
       e.stopPropagation();
       dropdownMenu.classList.toggle('active');
     });
+    
+    if( btnLog ) {
+      btnLog.addEventListener('click', () => this.showLogModal());
+    }
     
     document.addEventListener('click', (e) => {
       if( ! e.target.closest('.dropdown-wrapper') )
@@ -39,18 +44,59 @@ const App = {
     });
     
     this.attachTaskItemListeners();
+    this.attachTaskItemListenersMobile();
     this.attachGroupDeleteListeners();
 
-    document.querySelector('.modal-close')?.addEventListener('click', () => this.closeModal());
+    document.querySelectorAll('.modal-close').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const modal = e.target.closest('.modal-overlay');
+        if( modal )
+          modal.classList.remove('active');
+      });
+    });
+    
     document.getElementById('modalOverlay')?.addEventListener('click', (e) => {
       if( e.target.id === 'modalOverlay' )
         this.closeModal();
+    });
+    
+    document.getElementById('logModal')?.addEventListener('click', (e) => {
+      if( e.target.id === 'logModal' )
+        this.closeLogModal();
+    });
+    
+    document.getElementById('confirmModal')?.addEventListener('click', (e) => {
+      if( e.target.id === 'confirmModal' )
+        this.closeConfirmModal();
     });
   },
   
   attachTaskItemListeners()
   {
     document.querySelectorAll('.task-item').forEach(item => {
+      if( item.dataset.clickListenersAttached )
+        return;
+      
+      item.dataset.clickListenersAttached = 'true';
+      
+      item.addEventListener('click', (e) => {
+        if( ! e.target.classList.contains('btn-delete') && ! e.target.classList.contains('drag-handle') )
+          this.editTask(parseInt(item.dataset.index));
+      });
+      
+      const deleteBtn = item.querySelector('.btn-delete');
+      if( deleteBtn ) {
+        deleteBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.deleteTask(parseInt(deleteBtn.dataset.index));
+        });
+      }
+    });
+  },
+  
+  attachTaskItemListenersMobile()
+  {
+    document.querySelectorAll('.task-item-mobile').forEach(item => {
       if( item.dataset.clickListenersAttached )
         return;
       
@@ -211,6 +257,14 @@ const App = {
       if( deleteBtn )
         deleteBtn.dataset.index = index;
     });
+    
+    const itemsMobile = document.querySelectorAll('.task-item-mobile');
+    itemsMobile.forEach((item, index) => {
+      item.dataset.index = index;
+      const deleteBtn = item.querySelector('.btn-delete');
+      if( deleteBtn )
+        deleteBtn.dataset.index = index;
+    });
   },
 
   loadTasks()
@@ -260,10 +314,7 @@ const App = {
       </div>
     `;
     
-    if( window.innerWidth <= 768 )
-      this.showModal(promptHtml);
-    else
-      this.showEditor(promptHtml);
+    this.showModal(promptHtml);
     
     setTimeout(() => {
       const input = document.getElementById('groupNameInput');
@@ -281,14 +332,8 @@ const App = {
       if( btnConfirm )
         btnConfirm.addEventListener('click', () => this.saveNewGroup());
       
-      if( btnCancel ) {
-        btnCancel.addEventListener('click', () => {
-          if( window.innerWidth <= 768 )
-            this.closeModal();
-          else
-            document.getElementById('taskEditor').innerHTML = '<div class="editor-placeholder">Select a task to edit or create a new one</div>';
-        });
-      }
+      if( btnCancel )
+        btnCancel.addEventListener('click', () => this.closeModal());
     }, 10);
   },
   
@@ -300,7 +345,7 @@ const App = {
     
     const groupName = input.value.trim();
     if( ! groupName ) {
-      alert('Please enter a group name');
+      this.showConfirmModal('Error', 'Please enter a group name', () => {}, true);
       return;
     }
     
@@ -315,30 +360,33 @@ const App = {
         location.reload();
       }
       else
-        alert('Failed to create group: ' + (data.error || 'Unknown error'));
+        this.showSnackbar('Failed to create group: ' + (data.error || 'Unknown error'), 'error');
     })
-    .catch(err => alert('Error: ' + err.message));
+    .catch(err => this.showSnackbar('Error: ' + err.message, 'error'));
   },
   
   deleteGroup(groupName)
   {
-    if( ! confirm(`Are you sure you want to delete the group "${groupName}" and all its tasks?`) )
-      return;
-    
-    fetch('ajax.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'deleteGroup', groupName: groupName })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if( data.success ) {
-        location.reload();
+    this.showConfirmModal(
+      'Delete Group',
+      `Are you sure you want to delete the group "${groupName}" and all its tasks?`,
+      () => {
+        fetch('ajax.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'deleteGroup', groupName: groupName })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if( data.success ) {
+            location.reload();
+          }
+          else
+            this.showSnackbar('Failed to delete group: ' + (data.error || 'Unknown error'), 'error');
+        })
+        .catch(err => this.showSnackbar('Error: ' + err.message, 'error'));
       }
-      else
-        this.showSnackbar('Failed to delete group: ' + (data.error || 'Unknown error'), 'error');
-    })
-    .catch(err => this.showSnackbar('Error: ' + err.message, 'error'));
+    );
   },
 
   editTask(index)
@@ -368,37 +416,47 @@ const App = {
         else
           alert('Failed to load task: ' + (data.error || 'Unknown error'));
       })
-      .catch(err => alert('Error: ' + err.message));
+      .catch(err => this.showSnackbar('Error: ' + err.message, 'error'));
   },
 
   deleteTask(index)
   {
-    if( ! confirm('Are you sure you want to delete this task?') )
-      return;
-
-    fetch('ajax.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'delete', index: index })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if( data.success ) {
-        const item = document.querySelector(`.task-item[data-index="${index}"]`);
-        if( item ) {
-          item.remove();
-          this.updateTaskIndices();
-          
-          if( this.currentTaskIndex === index ) {
-            document.getElementById('taskEditor').innerHTML = '<div class="editor-placeholder">Select a task to edit or create a new one</div>';
-            this.currentTaskIndex = null;
+    this.showConfirmModal(
+      'Delete Task',
+      'Are you sure you want to delete this task?',
+      () => {
+        fetch('ajax.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'delete', index: index })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if( data.success ) {
+            const itemDesktop = document.querySelector(`.task-item[data-index="${index}"]`);
+            const itemMobile = document.querySelector(`.task-item-mobile[data-index="${index}"]`);
+            
+            if( itemDesktop )
+              itemDesktop.remove();
+            if( itemMobile )
+              itemMobile.remove();
+            
+            this.updateTaskIndices();
+            
+            if( this.currentTaskIndex === index ) {
+              document.getElementById('taskEditor').innerHTML = '<div class="editor-placeholder">Select a task to edit or create a new one</div>';
+              this.currentTaskIndex = null;
+            }
+            
+            if( window.innerWidth <= 768 )
+              this.closeModal();
           }
-        }
+          else
+            this.showSnackbar('Failed to delete task: ' + (data.error || 'Unknown error'), 'error');
+        })
+        .catch(err => this.showSnackbar('Error: ' + err.message, 'error'));
       }
-      else
-        this.showSnackbar('Failed to delete task: ' + (data.error || 'Unknown error'), 'error');
-    })
-    .catch(err => this.showSnackbar('Error: ' + err.message, 'error'));
+    );
   },
 
   renderEditor(task)
@@ -493,7 +551,9 @@ const App = {
 
   closeModal()
   {
-    document.getElementById('modalOverlay').classList.remove('active');
+    const modal = document.getElementById('modalOverlay');
+    if( modal )
+      modal.classList.remove('active');
   },
 
   attachFormListeners()
@@ -695,11 +755,18 @@ const App = {
   addTaskToList(taskData)
   {
     const taskList = document.getElementById('taskList');
+    const taskListMobile = document.getElementById('taskListMobile');
+    
     const emptyState = taskList.querySelector('.empty-state');
     if( emptyState )
       emptyState.remove();
     
+    const emptyStateMobile = taskListMobile?.querySelector('.empty-state');
+    if( emptyStateMobile )
+      emptyStateMobile.remove();
+    
     const newIndex = document.querySelectorAll('.task-item').length;
+    
     const taskHtml = `
       <div class="task-item" data-index="${newIndex}">
         <div class="drag-handle">⠸⠸</div>
@@ -715,9 +782,27 @@ const App = {
       </div>
     `;
     
+    const taskHtmlMobile = `
+      <div class="task-item-mobile" data-index="${newIndex}">
+        <div class="drag-handle">⠸⠸</div>
+        <div class="task-info-mobile">
+          <div class="task-name">${this.escapeHtml(taskData.name || '')}</div>
+          <div class="task-meta-mobile">
+            <span class="task-type">${this.escapeHtml(taskData.type || '')}</span>
+            <span class="task-interval">${this.escapeHtml(taskData.interval || '')}</span>
+          </div>
+          ${taskData.comment ? `<div class="task-comment">${this.escapeHtml(taskData.comment)}</div>` : ''}
+        </div>
+        <button class="btn-delete" data-index="${newIndex}" title="Delete task">×</button>
+      </div>
+    `;
+    
     taskList.insertAdjacentHTML('beforeend', taskHtml);
+    if( taskListMobile )
+      taskListMobile.insertAdjacentHTML('beforeend', taskHtmlMobile);
     
     this.attachTaskItemListeners();
+    this.attachTaskItemListenersMobile();
     this.attachDragListenersToItems();
   },
 
@@ -833,6 +918,77 @@ const App = {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  },
+  
+  showLogModal()
+  {
+    const logModal = document.getElementById('logModal');
+    const logContent = document.getElementById('logContent');
+    
+    logContent.textContent = 'Loading...';
+    logModal.classList.add('active');
+    
+    fetch('ajax.php?action=getLog')
+      .then(response => response.json())
+      .then(data => {
+        if( data.success )
+          logContent.textContent = data.content || 'Log file is empty';
+        else
+          logContent.textContent = 'Error: ' + (data.error || 'Failed to load log file');
+      })
+      .catch(err => {
+        logContent.textContent = 'Error: ' + err.message;
+      });
+  },
+  
+  closeLogModal()
+  {
+    document.getElementById('logModal').classList.remove('active');
+  },
+  
+  showConfirmModal(title, message, onConfirm, isAlert = false)
+  {
+    const modal = document.getElementById('confirmModal');
+    const titleEl = document.getElementById('confirmTitle');
+    const messageEl = document.getElementById('confirmMessage');
+    const btnConfirm = document.getElementById('btnConfirmAction');
+    const btnCancel = document.getElementById('btnCancelAction');
+    
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+    
+    if( isAlert ) {
+      btnConfirm.textContent = 'OK';
+      btnCancel.style.display = 'none';
+    }
+    else {
+      btnConfirm.textContent = 'Confirm';
+      btnCancel.style.display = 'block';
+    }
+    
+    const confirmHandler = () => {
+      this.closeConfirmModal();
+      if( onConfirm )
+        onConfirm();
+      btnConfirm.removeEventListener('click', confirmHandler);
+      btnCancel.removeEventListener('click', cancelHandler);
+    };
+    
+    const cancelHandler = () => {
+      this.closeConfirmModal();
+      btnConfirm.removeEventListener('click', confirmHandler);
+      btnCancel.removeEventListener('click', cancelHandler);
+    };
+    
+    btnConfirm.addEventListener('click', confirmHandler);
+    btnCancel.addEventListener('click', cancelHandler);
+    
+    modal.classList.add('active');
+  },
+  
+  closeConfirmModal()
+  {
+    document.getElementById('confirmModal').classList.remove('active');
   },
   
   adjustDevInfoHeight()

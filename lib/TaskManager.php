@@ -21,6 +21,12 @@ class TaskManager
     
     return Yaml::parseFile($this->configFile);
   }
+  
+  public function getLogFile() : ?string
+  {
+    $config = $this->loadConfig();
+    return $config['logFile'] ?? null;
+  }
 
   public function loadTasks() : array
   {

@@ -25,6 +25,17 @@ if( $_SERVER['REQUEST_METHOD'] === 'GET' ) {
         echo json_encode(['success' => false, 'error' => 'Task not found']);
       break;
 
+    case 'getLog':
+      $logFile = $taskManager->getLogFile();
+      if( $logFile && file_exists($logFile) ) {
+        $content = file_get_contents($logFile);
+        echo json_encode(['success' => true, 'content' => $content]);
+      }
+      else {
+        echo json_encode(['success' => false, 'error' => 'Log file not found']);
+      }
+      break;
+
     default:
       echo json_encode(['success' => false, 'error' => 'Invalid action']);
   }
